@@ -1,0 +1,222 @@
+# 🎯 Mục tiêu
+Tạo cấu trúc dự án Next.js (phiên bản mới nhất, App Router) nhưng vẫn giữ nguyên triết lý tổ chức thư mục như một dự án React thuần (giống hình dưới đây):
+
+src/
+├── apis/
+├── assets/
+├── components/
+├── constants/
+├── contexts/
+├── hooks/
+├── layouts/
+├── lib/
+├── pages/
+├── routes/
+├── store/
+├── theme/
+├── types/
+├── utils/
+└── App.tsx
+
+App sẽ là giao diện cha, các `pages` là con, và các route được chia thành file riêng trong `src/routes/`.
+
+---
+
+# ⚙️ Cấu trúc chi tiết
+
+src/
+├── apis/
+│   ├── axiosInstance.ts
+│   ├── user.api.ts
+│   └── product.api.ts
+│
+├── assets/
+│   ├── images/
+│   ├── icons/
+│   └── styles/
+│
+├── components/
+│   ├── ProtectedRoute/ProtectedRoute.component.tsx
+│   ├── Navbar/Navbar.component.tsx
+│   ├── Sidebar/Sidebar.component.tsx
+│   ├── Loader/Loader.component.tsx
+│   └── ui/
+│       ├── Button.tsx
+│       └── Input.tsx
+│
+├── constants/
+│   ├── paths.ts
+│   ├── config.ts
+│   └── roles.ts
+│
+├── contexts/
+│   ├── AuthContext.tsx
+│   ├── ThemeContext.tsx
+│   └── index.ts
+│
+├── hooks/
+│   ├── useAuth.ts
+│   ├── useFetch.ts
+│   ├── useLocalStorage.ts
+│   └── index.ts
+│
+├── layouts/
+│   ├── DashboardLayout/
+│   │   └── DashboardLayout.component.tsx
+│   ├── SidebarLayout/
+│   │   └── SidebarLayout.component.tsx
+│   └── PublicLayout/
+│       └── PublicLayout.component.tsx
+│
+├── lib/
+│   └── utils.ts
+│
+├── pages/
+│   ├── Home/Home.page.tsx
+│   ├── Login/Login.page.tsx
+│   ├── Dashboard/Dashboard.page.tsx
+│   ├── ProductDetail/ProductDetail.page.tsx
+│   ├── ProductDetail/components/General/General.component.tsx
+│   ├── Report/Report.page.tsx
+│   ├── Settings/SystemSettings.page.tsx
+│   └── ...
+│
+├── routes/
+│   ├── index.tsx                 # Import và merge các router con
+│   ├── Auth.routes.tsx           # Các route public (login, register)
+│   ├── Dashboard.routes.tsx      # Các route trong DashboardLayout
+│   ├── Product.routes.tsx        # Các route cho module sản phẩm
+│   └── Report.routes.tsx
+│
+├── store/
+│   ├── index.ts
+│   ├── auth.store.ts
+│   ├── product.store.ts
+│   └── ui.store.ts
+│
+├── theme/
+│   ├── globals.css
+│   ├── tailwind.config.ts
+│   └── index.ts
+│
+├── types/
+│   ├── user.d.ts
+│   ├── product.d.ts
+│   └── global.d.ts
+│
+├── utils/
+│   ├── formatDate.ts
+│   ├── logger.ts
+│   └── index.ts
+│
+├── App.tsx
+├── middleware.ts
+└── page.tsx
+
+---
+
+# 🧩 Yêu cầu code
+
+## App.tsx
+- Là entry point chính (giống _app.tsx của Next.js nhưng viết theo kiểu React).
+- Chứa `Routes` được import từ `src/routes/index.tsx`.
+- Dùng `<Suspense>` để lazy load page.
+- Có thể import global CSS, theme, provider.
+
+## routes/index.tsx
+- Import và kết hợp các route con:
+  ```tsx
+  import { AuthRoutes } from './Auth.routes';
+  import { DashboardRoutes } from './Dashboard.routes';
+  import { ProductRoutes } from './Product.routes';
+
+  export const AppRoutes = () => (
+    <>
+      {AuthRoutes()}
+      {DashboardRoutes()}
+      {ProductRoutes()}
+    </>
+  );
+  ```
+
+## routes/Dashboard.routes.tsx
+- Chứa route group có layout `DashboardLayout`:
+  ```tsx
+  import { Route } from 'react-router-dom';
+  import ProtectedRoute from '@/components/ProtectedRoute/ProtectedRoute.component';
+  import DashboardLayout from '@/layouts/DashboardLayout/DashboardLayout.component';
+  import { PATHS } from '@/constants/paths';
+  import FrmMain from '@/pages/FrmMain/FrmMain.page';
+  import TongHop from '@/pages/TongHop/TongHop.page';
+
+  export const DashboardRoutes = () => (
+    <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
+      <Route path={PATHS.DASHBOARD} element={<FrmMain />} />
+      <Route path={PATHS.TONG_HOP} element={<TongHop />} />
+    </Route>
+  );
+  ```
+
+## constants/paths.ts
+- Định nghĩa tất cả route path:
+  ```ts
+  export const PATHS = {
+    HOME: '/',
+    LOGIN: '/login',
+    DASHBOARD: '/dashboard',
+    TONG_HOP: '/tong-hop',
+    PRODUCTS: '/products',
+    REPORT: '/report',
+    SETTINGS: '/settings',
+    NOT_FOUND: '/not-found',
+  };
+  ```
+
+## middleware.ts
+- Dùng để bảo vệ route trong Next.js (nếu người dùng chưa đăng nhập thì redirect):
+  ```ts
+  import { NextResponse } from 'next/server';
+  import type { NextRequest } from 'next/server';
+
+  export function middleware(req: NextRequest) {
+    const token = req.cookies.get('token')?.value;
+    const protectedPaths = ['/dashboard', '/products', '/report'];
+
+    if (protectedPaths.some((p) => req.nextUrl.pathname.startsWith(p)) && !token) {
+      return NextResponse.redirect(new URL('/login', req.url));
+    }
+
+    return NextResponse.next();
+  }
+
+  export const config = {
+    matcher: ['/dashboard/:path*', '/products/:path*', '/report/:path*'],
+  };
+  ```
+
+---
+
+# ✅ Output mong muốn
+
+1. Toàn bộ cấu trúc thư mục như trên (giống hình React project).
+2. Code mẫu sẵn sàng chạy được trong Next.js.
+3. App.tsx hoạt động như component cha, routes chia nhỏ theo page.
+4. Có thể lazy load các page.
+5. Hỗ trợ bảo vệ route (ProtectedRoute + middleware).
+
+---
+
+# ⚡ Lệnh khởi tạo
+
+Tạo project:
+```
+npx create-next-app@latest webadmin --typescript --app --src-dir
+```
+
+Sau đó dán cấu trúc và code trên vào thư mục `src/`.
+
+---
+
+# 🔥 Mục tiêu
+Kết hợp sức mạnh của Next.js App Router với sự rõ ràng của kiến trúc React module hóa.  
+App là giao diện cha, pages là con, routes được chia nhỏ — giúp quản lý code dễ hơn và mở rộng linh hoạt.

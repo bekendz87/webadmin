@@ -1,0 +1,24 @@
+.pdf-viewer-container {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.upload-section {
+  padding: 20px;
+  text-align: center;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #ddd;
+}
+
+.file-input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+}
+
+.file-input:hover {
+  border-color: #007bff;
+}

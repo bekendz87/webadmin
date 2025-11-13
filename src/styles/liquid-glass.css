@@ -1,0 +1,185 @@
+/* ===== CSS Variables for Light & Dark Mode ===== */
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-blur: 16px;
+  --glass-border: rgba(255, 255, 255, 0.35);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10);
+
+  --primary-bg: #f7fafd;
+  --primary-text: #222;
+  --secondary-bg: #fff;
+  --accent: #39B45A;
+  --card-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.08);
+
+  --radius: 16px;
+  --transition: 0.4s cubic-bezier(.4,0,.2,1);
+}
+
+[data-theme="dark"] {
+  --glass-bg: rgba(24, 28, 40, 0.55);
+  --glass-blur: 18px;
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
+
+  --primary-bg: #181c28;
+  --primary-text: #f7fafd;
+  --secondary-bg: #23283a;
+  --accent: #39B45A;
+  --card-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.18);
+}
+
+/* ===== General Reset & Base ===== */
+body {
+  background: var(--primary-bg);
+  color: var(--primary-text);
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  transition: background var(--transition), color var(--transition);
+  min-height: 100vh;
+}
+
+/* ===== Liquid Glass Effect ===== */
+.liquid-glass,
+.liquid-glass-card,
+.liquid-glass-navbar,
+.liquid-glass-sidebar {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: var(--radius);
+  border: 1.5px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  transition:
+    background var(--transition),
+    box-shadow var(--transition),
+    border-color var(--transition),
+    backdrop-filter var(--transition),
+    -webkit-backdrop-filter var(--transition);
+}
+
+/* ===== Navbar ===== */
+.liquid-glass-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 0.75rem 2rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}
+
+/* ===== Sidebar ===== */
+.liquid-glass-sidebar {
+  min-width: 320px;    /* tăng từ 260px */
+  max-width: 360px;    /* tăng từ 320px */
+  padding: 2rem 1.5rem;
+  margin-right: 2rem;
+  transition: transform var(--transition), opacity var(--transition);
+  box-shadow: var(--card-shadow);
+  background: var(--glass-bg) !important; /* đảm bảo không có nền đen */
+  border-radius: 0; /* Bỏ bo góc để full background */
+}
+.liquid-glass-sidebar.hide {
+  transform: translateX(-120%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ===== Card ===== */
+.liquid-glass-card {
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--card-shadow);
+  border-radius: var(--radius);
+  transition: box-shadow var(--transition), background var(--transition);
+  animation: fadeInUp 0.7s cubic-bezier(.4,0,.2,1);
+}
+.liquid-glass-card:hover {
+  box-shadow: 0 8px 40px 0 rgba(31, 38, 135, 0.18);
+  background: rgba(255,255,255,0.65);
+  transition: box-shadow 0.25s, background 0.25s;
+}
+[data-theme="dark"] .liquid-glass-card:hover {
+  background: rgba(24,28,40,0.65);
+}
+
+/* ===== Animation ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== Theme Toggle Button ===== */
+.theme-toggle-btn {
+  background: var(--glass-bg);
+  border: 1.5px solid var(--glass-border);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--glass-shadow);
+  font-size: 1.3rem;
+  transition: background var(--transition), border-color var(--transition), box-shadow var(--transition), color var(--transition);
+  margin-left: 1rem;
+}
+.theme-toggle-btn:hover {
+  background: rgba(255,255,255,0.75);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+}
+[data-theme="dark"] .theme-toggle-btn:hover {
+  background: rgba(24,28,40,0.75);
+}
+
+/* ===== Header ===== */
+.liquid-glass-header {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: var(--radius);
+  border: 1.5px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  padding: 1.25rem 2rem;
+  margin-bottom: 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+  .liquid-glass-sidebar {
+    min-width: 0;
+    max-width: 100vw;
+    margin-right: 0;
+    padding: 1.5rem 1rem; /* tăng padding mobile */
+  }
+  .liquid-glass-navbar {
+    padding: 0.5rem 1rem;
+  }
+  .liquid-glass-header {
+    padding: 1rem 1rem;
+  }
+}
+
+/* ===== Misc ===== */
+::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 8px;
+}
