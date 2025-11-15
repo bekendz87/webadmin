@@ -11,6 +11,10 @@ const routerPath = {
     scheduleAppointment: '/schedule-appointment-report',
     examinationReport: '/examination-report',
 
+    // Add request debit route
+    requestDebit: '/request-debit',
+    requestDebitIndividual: '/request-debit-individual', // Add individual debit route
+
     // Next.js API routes (internal) - via proxy
     auth: {
         login: '/api/auth/login',
@@ -37,6 +41,12 @@ const routerPath = {
         groups: '/api/cashier/groups',
         users: '/api/cashier/users',
         offset: '/api/cashier/offset',
+    },
+
+    // Debit API routes (internal) - via proxy
+    debit_client: {
+        list: '/api/debit/list',
+        listRefund: '/api/debit/listRefund',
     },
 
     // Schedule Appointment API routes (internal) - via proxy
@@ -96,6 +106,12 @@ const routerPath = {
         CHANGE_TYPE: '/invoices/change-invoice-type',
     },
 
+    // Backend debit endpoints (reuse cashier endpoints)
+    BACKEND_DEBIT: {
+        LIST: '/invoices/list',
+        LIST_REFUND: '/invoices/listRefund',
+    },
+
     // Backend schedule appointment endpoints
     BACKEND_SCHEDULE_APPOINTMENT: {
         LIST_ACCOUNTANT: '/report/schedule-appointment/list/accountant',
@@ -146,6 +162,12 @@ export const API_ENDPOINTS = {
         changeType: '/api/cashier/change-type',
     },
 
+    // Debit endpoints
+    DEBIT: {
+        list: '/api/debit/list',
+        listRefund: '/api/debit/listRefund',
+    },
+
     // Schedule Appointment endpoints
     SCHEDULE_APPOINTMENT: '/api/schedule-appointment',
 
@@ -164,6 +186,9 @@ export const API_ENDPOINTS = {
 
     // Backend cashier endpoints
     BACKEND_CASHIER: routerPath.BACKEND_CASHIER,
+
+    // Backend debit endpoints
+    BACKEND_DEBIT: routerPath.BACKEND_DEBIT,
 };
 
 export default routerPath;

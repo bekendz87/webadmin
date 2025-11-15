@@ -10,6 +10,9 @@ import ScheduleAppointmentPage from '@/pages/ScheduleAppointment/ScheduleAppoint
 import NotFoundPage from '@/pages/NotFound/NotFound.page';
 import ExaminationReportPage from '@/pages/ExaminationReport/ExaminationReport.page';
 import CashierReportPage from '@/pages/CashierReport/CashierReport.page';
+import DebitReportPage from '@/pages/DebitReport/DebitReport.page';
+import RequestDebitPage from '@/pages/RequestDebit/RequestDebit.page';
+import RequestDebitIndividualPage from '@/pages/RequestDebitIndividual/RequestDebitIndividual.page';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -82,7 +85,35 @@ export const AppRoutes: React.FC = () => {
         }
       />
 
-      {/* 404 route - không cần ProtectedRoute vì AutoLayout sẽ handle */}
+      <Route
+        path="/debit-report"
+        element={
+          <ProtectedRoute requireAuth={true}>
+            <DebitReportPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Add request debit route */}
+      <Route
+        path="/debit-withdraw-report"
+        element={
+          <ProtectedRoute requireAuth={true}>
+            <RequestDebitPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/return-money-report"
+        element={
+          <ProtectedRoute requireAuth={true}>
+            <RequestDebitIndividualPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* 404 route */}
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

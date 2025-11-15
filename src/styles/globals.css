@@ -140,13 +140,11 @@ body {
     width: 100%;
     height: 100%;
     background:
-        radial-gradient(circle at 20% 50%, rgba(52, 199, 89, 0.4) 0%, transparent 60%),
-        radial-gradient(circle at 80% 20%, rgba(0, 122, 255, 0.3) 0%, transparent 55%),
-        radial-gradient(circle at 40% 80%, rgba(48, 176, 199, 0.35) 0%, transparent 50%),
-        radial-gradient(circle at 70% 70%, rgba(88, 86, 214, 0.25) 0%, transparent 45%);
+        linear-gradient(135deg, rgba(52, 199, 89, 0.08) 0%, transparent 50%),
+        linear-gradient(225deg, rgba(0, 122, 255, 0.06) 0%, transparent 40%),
+        linear-gradient(315deg, rgba(48, 176, 199, 0.05) 0%, transparent 45%);
     pointer-events: none;
     z-index: -1;
-    animation: floatingGradients 20s ease-in-out infinite;
 }
 
 body.dark,
@@ -157,11 +155,9 @@ html.dark body {
 
 .dark .macos-liquid-glass::before {
     background:
-        radial-gradient(circle at 20% 50%, rgba(52, 199, 89, 0.25) 0%, transparent 60%),
-        radial-gradient(circle at 80% 20%, rgba(10, 132, 255, 0.2) 0%, transparent 55%),
-        radial-gradient(circle at 40% 80%, rgba(6, 182, 212, 0.2) 0%, transparent 50%),
-        radial-gradient(circle at 70% 70%, rgba(168, 85, 247, 0.15) 0%, transparent 45%);
-    animation: floatingGradientsDark 25s ease-in-out infinite;
+        linear-gradient(135deg, rgba(52, 199, 89, 0.05) 0%, transparent 50%),
+        linear-gradient(225deg, rgba(10, 132, 255, 0.04) 0%, transparent 40%),
+        linear-gradient(315deg, rgba(6, 182, 212, 0.03) 0%, transparent 45%);
 }
 
 /* Utility classes */
@@ -949,23 +945,25 @@ html.dark body {
         border-radius: 50%;
     }
 
-    /* macOS26 Table Styles - Enhanced with Horizontal Scrolling */
+    /* macOS26 Table Styles - Enhanced with better visibility */
     .macos26-table-wrapper {
-        background: var(--card-bg);
-        backdrop-filter: var(--backdrop-blur);
-        -webkit-backdrop-filter: var(--backdrop-blur);
-        border: 1px solid var(--card-border);
+        background: rgba(255, 255, 255, 0.75);
+        border: 1px solid rgba(0, 0, 0, 0.1);
         border-radius: 1.25rem;
         box-shadow: var(--glass-shadow);
         position: relative;
         overflow: hidden;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        /* Enhanced scrolling support */
         overflow-x: auto;
         overflow-y: hidden;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: thin;
         scrollbar-color: var(--card-border) transparent;
+    }
+
+    .dark .macos26-table-wrapper {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
     }
 
     .macos26-table-wrapper::before {
@@ -974,8 +972,6 @@ html.dark body {
         top: 0;
         left: 0;
         width: 100%;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
         pointer-events: none;
         z-index: 2;
     }
@@ -1237,96 +1233,34 @@ html.dark body {
         opacity: 1;
     }
 
-    /* Mobile and responsive enhancements */
-    @media (max-width: 768px) {
-        .macos26-table-wrapper {
-            border-radius: 1rem;
-            margin: 0 -0.5rem;
-            /* Enhanced mobile scrolling */
-            -webkit-overflow-scrolling: touch;
-            scroll-behavior: smooth;
-        }
-
-        .macos26-table-header-cell,
-        .macos26-table-cell {
-            padding: 0.75rem 1rem;
-            font-size: 0.8rem;
-            min-width: 100px;
-        }
-
-        .macos26-table-header-cell {
-            font-size: 0.7rem;
-        }
-
-        /* Adjust minimum widths for mobile */
-        .macos26-table-header-cell.min-w-\[150px\],
-        .macos26-table-cell.min-w-\[150px\] {
-            min-width: 120px;
-        }
-
-        .macos26-table-header-cell.min-w-\[200px\],
-        .macos26-table-cell.min-w-\[200px\] {
-            min-width: 150px;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .macos26-table-wrapper {
-            border-radius: 0.75rem;
-            margin: 0 -1rem;
-        }
-
-        .macos26-table-header-cell,
-        .macos26-table-cell {
-            padding: 0.625rem 0.75rem;
-            font-size: 0.75rem;
-            min-width: 80px;
-        }
-
-        .macos26-table-header-cell {
-            font-size: 0.65rem;
-        }
-    }
-
-    /* Enhanced table utilities */
-    .table-fixed-layout {
-        table-layout: fixed;
-    }
-
-    .table-auto-layout {
-        table-layout: auto;
-    }
-
-    /* Sticky column support (for future use) */
-    .sticky-column {
-        position: sticky;
-        left: 0;
-        background: var(--card-bg);
-        z-index: 3;
-    }
-
-    .sticky-column::after {
-        content: '';
+    /* Enhanced scroll hints */
+    .table-scroll-hint {
         position: absolute;
-        top: 0;
-        right: 0;
         bottom: 0;
-        width: 1px;
-        background: var(--card-border);
-    }
-
-    /* macOS26 Modal Enhancements */
-    .macos26-modal-header-icon {
-        background: var(--card-bg);
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--glass-bg);
         backdrop-filter: var(--backdrop-blur);
         -webkit-backdrop-filter: var(--backdrop-blur);
         border: 1px solid var(--card-border);
-        border-radius: 1rem;
-        box-shadow: var(--glass-shadow);
+        border-radius: 1rem 1rem 0 0;
+        padding: 0.5rem 1rem;
+        font-size: 0.75rem;
+        color: var(--primary-text-secondary);
+        z-index: 10;
+        opacity: 0;
+        transform: translateX(-50%) translateY(100%);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        pointer-events: none;
+        white-space: nowrap;
     }
 
-    .macos26-modal-header-icon::before {
+    .table-scroll-hint.visible {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    .table-scroll-hint::before {
         content: '';
         position: absolute;
         top: 0;
@@ -1337,345 +1271,107 @@ html.dark body {
         pointer-events: none;
     }
 
-    .macos26-info-card {
-        background: var(--card-bg);
-        backdrop-filter: var(--backdrop-blur);
-        -webkit-backdrop-filter: var(--backdrop-blur);
-        border: 1px solid var(--card-border);
-        border-radius: 1rem;
-        padding: 1.5rem;
-        box-shadow: var(--glass-shadow);
+    /* Scroll hint with animation */
+    .table-scroll-hint-animated {
+        animation: scrollHintPulse 2s infinite;
+    }
+
+    @keyframes scrollHintPulse {
+
+        0%,
+        100% {
+            opacity: 0.7;
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+
+        50% {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-2px) scale(1.02);
+        }
+    }
+
+    /* Scroll hint icons */
+    .scroll-hint-icon {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        animation: scrollHintMove 1.5s ease-in-out infinite;
+    }
+
+    @keyframes scrollHintMove {
+
+        0%,
+        100% {
+            transform: translateX(0);
+        }
+
+        50% {
+            transform: translateX(4px);
+        }
+    }
+
+    /* Table wrapper with scroll detection */
+    .table-wrapper-with-scroll {
         position: relative;
         overflow: hidden;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 1.25rem;
     }
 
-    .macos26-info-card::before {
+    .table-wrapper-with-scroll::after {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        inset: 0;
+        border-radius: inherit;
+        padding: 1px;
+        background: linear-gradient(135deg, var(--card-border), transparent, var(--card-border));
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        mask-composite: xor;
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
         pointer-events: none;
     }
 
-    .macos26-info-card-primary {
-        background: linear-gradient(135deg, rgba(0, 122, 255, 0.08), rgba(0, 122, 255, 0.04));
-        border-color: rgba(0, 122, 255, 0.2);
-        box-shadow: 0 8px 32px rgba(0, 122, 255, 0.1);
-    }
-
-    .macos26-info-card-success {
-        background: linear-gradient(135deg, rgba(52, 199, 89, 0.08), rgba(52, 199, 89, 0.04));
-        border-color: rgba(52, 199, 89, 0.2);
-        box-shadow: 0 8px 32px rgba(52, 199, 89, 0.1);
-    }
-
-    .macos26-info-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.5rem 0;
-        border-bottom: 1px solid var(--card-border);
-        transition: all 0.2s ease;
-    }
-
-    .macos26-info-row:last-child {
-        border-bottom: none;
-        padding-bottom: 0;
-    }
-
-    .macos26-info-row:hover {
-        background: rgba(255, 255, 255, 0.05);
-        padding: 0.5rem;
-        margin: 0 -0.5rem;
-        border-radius: 0.5rem;
-    }
-
-    .macos26-info-label {
-        font-size: 0.875rem;
-        color: var(--primary-text-secondary);
-        font-weight: 500;
-    }
-
-    .macos26-info-value {
-        font-size: 0.875rem;
-        color: var(--primary-text);
-        font-weight: 600;
-    }
-
-    .macos26-info-value-accent {
-        color: var(--accent);
-        font-weight: 700;
-        font-size: 1rem;
-    }
-
-    .macos26-info-value-mono {
-        font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
-    }
-
-    /* Section headers for modal content */
-    .macos26-section-header {
-        font-size: 1.125rem;
-        font-weight: 700;
-        color: var(--primary-text);
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 1px solid var(--card-border);
-        position: relative;
-    }
-
-    .macos26-section-header::after {
-        content: '';
-        position: absolute;
-        bottom: -1px;
-        left: 0;
-        width: 3rem;
-        height: 2px;
+    /* Enhanced scrollbar for better visibility */
+    .macos26-table-wrapper:hover::-webkit-scrollbar-thumb {
         background: var(--accent);
-        border-radius: 1px;
+        box-shadow: 0 0 6px var(--accent);
     }
 
-    /* macOS26 Input Styles */
-    .macos26-input-wrapper {
-        position: relative;
-        width: 100%;
-    }
-
-    .macos26-input-label {
-        display: block;
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: var(--primary-text);
-        margin-bottom: 0.5rem;
-        font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-        transition: color 0.2s ease;
-    }
-
-    .macos26-input-label-required::after {
-        content: ' *';
-        color: var(--macos-red);
-        font-weight: 500;
-    }
-
-    .macos26-input {
-        width: 100%;
-        background: var(--card-bg);
-        backdrop-filter: var(--backdrop-blur);
-        -webkit-backdrop-filter: var(--backdrop-blur);
-        border: 1px solid var(--card-border);
-        border-radius: 0.75rem;
-        padding: 0.875rem 1rem;
-        color: var(--primary-text);
-        font-size: 0.875rem;
-        line-height: 1.25rem;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        outline: none;
-        position: relative;
-        font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-        box-shadow: var(--glass-shadow);
-    }
-
-    .macos26-input::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-        pointer-events: none;
-        border-radius: 0.75rem 0.75rem 0 0;
-    }
-
-    .macos26-input:focus {
-        border-color: var(--accent);
-        box-shadow:
-            var(--glass-shadow),
-            0 0 0 3px rgba(52, 199, 89, 0.15);
-        background: var(--glass-bg);
-        transform: translateY(-1px);
-    }
-
-    .macos26-input::placeholder {
-        color: var(--primary-text-secondary);
-        opacity: 0.8;
-    }
-
-    .macos26-input:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-        background: var(--card-bg);
-        border-color: var(--card-border);
-        transform: none !important;
-        box-shadow: none !important;
-    }
-
-    .macos26-input-with-icon-left {
-        padding-left: 2.75rem;
-    }
-
-    .macos26-input-with-icon-right {
-        padding-right: 2.75rem;
-    }
-
-    .macos26-input-icon {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--primary-text-secondary);
-        transition: color 0.2s ease;
-        z-index: 10;
-    }
-
-    .macos26-input-icon-left {
-        left: 1rem;
-    }
-
-    .macos26-input-icon-right {
-        right: 1rem;
-    }
-
-    .macos26-input-icon-clickable {
-        cursor: pointer;
-        padding: 0.25rem;
-        border-radius: 0.375rem;
-        transition: all 0.2s ease;
-    }
-
-    .macos26-input-icon-clickable:hover {
-        color: var(--accent);
-        background: var(--card-bg);
-    }
-
-    .macos26-input:focus+.macos26-input-icon,
-    .macos26-input-wrapper:focus-within .macos26-input-icon {
-        color: var(--accent);
-    }
-
-    /* Input Error State */
-    .macos26-input-error {
-        border-color: var(--macos-red) !important;
-        box-shadow:
-            var(--glass-shadow),
-            0 0 0 3px rgba(255, 59, 48, 0.15) !important;
-    }
-
-    .macos26-input-error:focus {
-        border-color: var(--macos-red) !important;
-        box-shadow:
-            var(--glass-shadow),
-            0 0 0 3px rgba(255, 59, 48, 0.2) !important;
-    }
-
-    .macos26-input-helper {
-        margin-top: 0.5rem;
-        font-size: 0.75rem;
-        line-height: 1rem;
-        display: flex;
-        align-items: flex-start;
-        gap: 0.375rem;
-    }
-
-    .macos26-input-helper-text {
-        color: var(--primary-text-secondary);
-    }
-
-    .macos26-input-helper-error {
-        color: var(--macos-red);
-    }
-
-    .macos26-input-helper-icon {
-        width: 1rem;
-        height: 1rem;
-        flex-shrink: 0;
-        margin-top: 0.125rem;
-    }
-
-    /* Input Size Variants */
-    .macos26-input-sm {
-        padding: 0.625rem 0.875rem;
-        font-size: 0.8rem;
-        border-radius: 0.625rem;
-    }
-
-    .macos26-input-sm.macos26-input-with-icon-left {
-        padding-left: 2.25rem;
-    }
-
-    .macos26-input-sm.macos26-input-with-icon-right {
-        padding-right: 2.25rem;
-    }
-
-    .macos26-input-lg {
-        padding: 1rem 1.25rem;
-        font-size: 1rem;
-        border-radius: 1rem;
-    }
-
-    .macos26-input-lg.macos26-input-with-icon-left {
-        padding-left: 3.25rem;
-    }
-
-    .macos26-input-lg.macos26-input-with-icon-right {
-        padding-right: 3.25rem;
-    }
-
-    /* Responsive input adjustments */
+    /* Responsive scroll hints */
     @media (max-width: 768px) {
-        .macos26-input {
-            font-size: 16px;
-            /* Prevents zoom on iOS */
-            padding: 0.75rem 0.875rem;
+        .table-scroll-hint {
+            font-size: 0.7rem;
+            padding: 0.375rem 0.75rem;
         }
 
-        .macos26-input-with-icon-left {
-            padding-left: 2.5rem;
-        }
-
-        .macos26-input-with-icon-right {
-            padding-right: 2.5rem;
-        }
-
-        .macos26-input-icon {
-            width: 1rem;
-            height: 1rem;
-        }
-
-        .macos26-input-icon-left {
-            left: 0.875rem;
-        }
-
-        .macos26-input-icon-right {
-            right: 0.875rem;
+        .table-scroll-indicator-left,
+        .table-scroll-indicator-right {
+            width: 1.5rem;
         }
     }
 
-    /* Table in Modal Overrides */
-    .macos26-info-card .macos26-table-wrapper {
-        border: none;
-        border-radius: 0;
-        box-shadow: none;
-        background: transparent;
+    @media (hover: none) and (pointer: coarse) {
+
+        /* Touch devices - hide scroll hints */
+        .table-scroll-hint {
+            display: none;
+        }
     }
 
-    .macos26-info-card .macos26-table-wrapper::before {
-        display: none;
-    }
+    /* Desktop-specific scroll enhancements */
+    @media (hover: hover) and (pointer: fine) {
+        .macos26-table-wrapper {
+            cursor: grab;
+        }
 
-    .macos26-info-card .macos26-table-head {
-        background: rgba(255, 255, 255, 0.05);
-    }
+        .macos26-table-wrapper:active {
+            cursor: grabbing;
+        }
 
-    .macos26-info-card .macos26-table-header-cell {
-        border-bottom: 1px solid var(--card-border);
-        background: transparent;
-    }
-
-    .macos26-info-card .macos26-table-row:hover {
-        background: rgba(255, 255, 255, 0.02);
+        .table-scroll-hint {
+            display: flex;
+            align-items: center;
+        }
     }
 
     /* Enhanced Table Cell Styles */
@@ -3597,44 +3293,245 @@ html.dark body {
             font-size: 0.65rem;
         }
     }
+
+    /* macOS26 Input Styles - Enhanced */
+    .macos26-input-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
+    .macos26-input-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--primary-text);
+        margin-bottom: 0.5rem;
+        font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+        transition: color 0.2s ease;
+    }
+
+    .macos26-input-label-required::after {
+        content: ' *';
+        color: var(--macos-red);
+        font-weight: 500;
+    }
+
+    .macos26-input {
+        width: 100%;
+        background: var(--card-bg);
+        backdrop-filter: var(--backdrop-blur);
+        -webkit-backdrop-filter: var(--backdrop-blur);
+        border: 1px solid var(--card-border);
+        border-radius: 0.75rem;
+        padding: 0.875rem 1rem;
+        color: var(--primary-text);
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        outline: none;
+        position: relative;
+        font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+        box-shadow: var(--glass-shadow);
+    }
+
+    .macos26-input::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        pointer-events: none;
+        border-radius: 0.75rem 0.75rem 0 0;
+    }
+
+    .macos26-input:focus {
+        border-color: var(--accent);
+        box-shadow:
+            var(--glass-shadow),
+            0 0 0 3px rgba(52, 199, 89, 0.15);
+        background: var(--glass-bg);
+        transform: translateY(-1px);
+    }
+
+    .macos26-input::placeholder {
+        color: var(--primary-text-secondary);
+        opacity: 0.8;
+    }
+
+    .macos26-input:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        background: var(--card-bg);
+        border-color: var(--card-border);
+        transform: none !important;
+        box-shadow: var(--glass-shadow) !important;
+    }
+
+    .macos26-input-with-icon-left {
+        padding-left: 2.75rem;
+    }
+
+    .macos26-input-with-icon-right {
+        padding-right: 2.75rem;
+    }
+
+    .macos26-input-icon {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--primary-text-secondary);
+        transition: color 0.2s ease;
+        z-index: 10;
+        width: 1rem;
+        height: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .macos26-input-icon-left {
+        left: 1rem;
+    }
+
+    .macos26-input-icon-right {
+        right: 1rem;
+    }
+
+    .macos26-input-icon-clickable {
+        cursor: pointer;
+        padding: 0.25rem;
+        border-radius: 0.375rem;
+        transition: all 0.2s ease;
+    }
+
+    .macos26-input-icon-clickable:hover {
+        color: var(--accent);
+        background: var(--card-bg);
+    }
+
+    .macos26-input:focus+.macos26-input-icon,
+    .macos26-input-wrapper:focus-within .macos26-input-icon {
+        color: var(--accent);
+    }
+
+    /* Input Error State */
+    .macos26-input-error {
+        border-color: var(--macos-red) !important;
+        box-shadow:
+            var(--glass-shadow),
+            0 0 0 3px rgba(255, 59, 48, 0.15) !important;
+    }
+
+    .macos26-input-error:focus {
+        border-color: var(--macos-red) !important;
+        box-shadow:
+            var(--glass-shadow),
+            0 0 0 3px rgba(255, 59, 48, 0.2) !important;
+    }
+
+    .macos26-input-helper {
+        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        line-height: 1rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.375rem;
+    }
+
+    .macos26-input-helper-text {
+        color: var(--primary-text-secondary);
+    }
+
+    .macos26-input-helper-error {
+        color: var(--macos-red);
+    }
+
+    .macos26-input-helper-icon {
+        width: 1rem;
+        height: 1rem;
+        flex-shrink: 0;
+        margin-top: 0.125rem;
+    }
+
+    /* Input Size Variants */
+    .macos26-input-sm {
+        padding: 0.625rem 0.875rem;
+        font-size: 0.8rem;
+        border-radius: 0.625rem;
+    }
+
+    .macos26-input-sm.macos26-input-with-icon-left {
+        padding-left: 2.25rem;
+    }
+
+    .macos26-input-sm.macos26-input-with-icon-right {
+        padding-right: 2.25rem;
+    }
+
+    .macos26-input-lg {
+        padding: 1rem 1.25rem;
+        font-size: 1rem;
+        border-radius: 1rem;
+    }
+
+    .macos26-input-lg.macos26-input-with-icon-left {
+        padding-left: 3.25rem;
+    }
+
+    .macos26-input-lg.macos26-input-with-icon-right {
+        padding-right: 3.25rem;
+    }
+
+    /* Dark mode adjustments for input */
+    .dark .macos26-input {
+        background: var(--card-bg);
+        border-color: var(--card-border);
+        color: var(--primary-text);
+    }
+
+    .dark .macos26-input:focus {
+        background: var(--glass-bg);
+        border-color: var(--accent);
+    }
+
+    .dark .macos26-input::placeholder {
+        color: var(--primary-text-secondary);
+    }
+
+    /* Responsive input adjustments */
+    @media (max-width: 768px) {
+        .macos26-input {
+            font-size: 16px;
+            /* Prevents zoom on iOS */
+            padding: 0.75rem 0.875rem;
+        }
+
+        .macos26-input-with-icon-left {
+            padding-left: 2.5rem;
+        }
+
+        .macos26-input-with-icon-right {
+            padding-right: 2.5rem;
+        }
+
+        .macos26-input-icon {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .macos26-input-icon-left {
+            left: 0.875rem;
+        }
+
+        .macos26-input-icon-right {
+            right: 0.875rem;
+        }
+    }
 }
 
 /* Enhanced animations for new components */
-@keyframes floatingGradients {
-
-    0%,
-    100% {
-        transform: translate(0px, 0px) scale(1);
-    }
-
-    33% {
-        transform: translate(30px, -50px) scale(1.1);
-    }
-
-    66% {
-        transform: translate(-20px, 20px) scale(0.9);
-    }
-}
-
-@keyframes floatingGradientsDark {
-
-    0%,
-    100% {
-        transform: translate(0px, 0px) scale(1);
-    }
-
-    25% {
-        transform: translate(-30px, -30px) scale(1.1);
-    }
-
-    50% {
-        transform: translate(30px, 10px) scale(0.9);
-    }
-
-    75% {
-        transform: translate(-10px, 30px) scale(1.05);
-    }
-}
 
 /* Loading spinner enhancements */
 @keyframes spin {
@@ -3690,6 +3587,7 @@ html.dark body {
 }
 
 .loading-spinner::before {
+
     content: '';
     position: absolute;
     inset: -3px;
@@ -3897,19 +3795,18 @@ html.dark body {
     width: 100%;
     height: 100%;
     background:
-        radial-gradient(circle at 20% 50%, rgba(52, 199, 89, 0.15) 0%, transparent 60%),
-        radial-gradient(circle at 80% 20%, rgba(0, 122, 255, 0.1) 0%, transparent 55%),
-        radial-gradient(circle at 40% 80%, rgba(48, 176, 199, 0.12) 0%, transparent 50%);
+        linear-gradient(135deg, rgba(52, 199, 89, 0.06) 0%, transparent 50%),
+        linear-gradient(225deg, rgba(0, 122, 255, 0.05) 0%, transparent 40%),
+        linear-gradient(315deg, rgba(48, 176, 199, 0.04) 0%, transparent 45%);
     pointer-events: none;
     z-index: -1;
-    animation: floatingGradients 20s ease-in-out infinite;
 }
 
 .dark .macos-login-bg::before {
     background:
-        radial-gradient(circle at 20% 50%, rgba(52, 199, 89, 0.08) 0%, transparent 60%),
-        radial-gradient(circle at 80% 20%, rgba(10, 132, 255, 0.06) 0%, transparent 55%),
-        radial-gradient(circle at 40% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 50%);
+        linear-gradient(135deg, rgba(52, 199, 89, 0.03) 0%, transparent 50%),
+        linear-gradient(225deg, rgba(10, 132, 255, 0.025) 0%, transparent 40%),
+        linear-gradient(315deg, rgba(6, 182, 212, 0.02) 0%, transparent 45%);
 }
 
 /* macOS26 Interface Base */
@@ -3925,3 +3822,262 @@ html.dark body {
     min-height: 100vh;
     position: relative;
 }
+
+.macos-app {
+    background: var(--primary-bg);
+    min-height: 100vh;
+    position: relative;
+}
+
+/* Enhanced macOS26 Table Styles - Improved visibility for both themes */
+.macos26-table-wrapper {
+    background: rgba(255, 255, 255, 0.85);
+    border: 2px solid rgba(0, 0, 0, 0.15);
+    border-radius: 1.25rem;
+    box-shadow:
+        var(--glass-shadow),
+        0 4px 20px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
+}
+
+.dark .macos26-table-wrapper {
+    background: var(--card-bg);
+    border: 2px solid var(--card-border);
+    scrollbar-color: var(--card-border) transparent;
+}
+
+.macos26-table-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Enhanced scrollbar styling for better visibility */
+.macos26-table-wrapper::-webkit-scrollbar {
+    height: 12px;
+}
+
+.macos26-table-wrapper::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 0 0 1.25rem 1.25rem;
+    margin: 0 1rem;
+}
+
+.macos26-table-wrapper::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2));
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+    transition: background 0.2s ease;
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.2);
+}
+
+.macos26-table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, var(--accent), rgba(52, 199, 89, 0.8));
+    box-shadow:
+        inset 0 0 6px rgba(0, 0, 0, 0.3),
+        0 0 8px var(--accent);
+}
+
+/* Dark mode scrollbar */
+.dark .macos26-table-wrapper::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.dark .macos26-table-wrapper::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--card-border), rgba(255, 255, 255, 0.1));
+    box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.1);
+}
+
+.dark .macos26-table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, var(--accent), rgba(52, 199, 89, 0.8));
+    box-shadow:
+        inset 0 0 6px rgba(255, 255, 255, 0.2),
+        0 0 8px var(--accent);
+}
+
+/* Enhanced scroll indicators with better visibility */
+.table-scroll-indicator-left,
+.table-scroll-indicator-right {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 3rem;
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.table-scroll-indicator-left {
+    left: 0;
+    background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0.95),
+            rgba(255, 255, 255, 0.7),
+            transparent);
+}
+
+.table-scroll-indicator-right {
+    right: 0;
+    background: linear-gradient(270deg,
+            rgba(255, 255, 255, 0.95),
+            rgba(255, 255, 255, 0.7),
+            transparent);
+}
+
+/* Dark mode indicators */
+.dark .table-scroll-indicator-left {
+    background: linear-gradient(90deg,
+            var(--card-bg),
+            rgba(0, 0, 0, 0.4),
+            transparent);
+}
+
+.dark .table-scroll-indicator-right {
+    background: linear-gradient(270deg,
+            var(--card-bg),
+            rgba(0, 0, 0, 0.4),
+            transparent);
+}
+
+.table-scroll-indicator-left.visible,
+.table-scroll-indicator-right.visible {
+    opacity: 1;
+}
+
+/* Enhanced scroll hint with better styling */
+.table-scroll-hint {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 1rem 1rem 0 0;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.75rem;
+    color: white;
+    z-index: 15;
+    opacity: 0;
+    transform: translateX(-50%) translateY(100%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    white-space: nowrap;
+    font-weight: 500;
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode hint */
+.dark .table-scroll-hint {
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--primary-text);
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.table-scroll-hint.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.table-scroll-hint::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    pointer-events: none;
+}
+
+/* Enhanced wrapper container */
+.table-wrapper-with-scroll {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.25rem;
+    /* Add subtle glow effect */
+    box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.1),
+        0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.dark .table-wrapper-with-scroll {
+    box-shadow:
+        0 0 0 1px var(--card-border),
+        var(--glass-shadow);
+}
+
+.table-wrapper-with-scroll::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(135deg,
+            rgba(0, 0, 0, 0.1),
+            transparent,
+            rgba(0, 0, 0, 0.1));
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: xor;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    pointer-events: none;
+}
+
+.dark .table-wrapper-with-scroll::after {
+    background: linear-gradient(135deg,
+            var(--card-border),
+            transparent,
+            var(--card-border));
+}
+
+/* Enhanced hover effects for table wrapper */
+.table-wrapper-with-scroll:hover .macos26-table-wrapper {
+    border-color: rgba(0, 0, 0, 0.2);
+    box-shadow:
+        var(--glass-shadow),
+        0 8px 30px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.dark .table-wrapper-with-scroll:hover .macos26-table-wrapper {
+    border-color: var(--accent);
+    box-shadow:
+        var(--glass-shadow),
+        0 8px 30px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(52, 199, 89, 0.1);
+}
+
+/* Force visibility for testing - remove this after confirming it works */
+.debug-scroll-wrapper {
+    border: 3px solid red !important;
+    background: rgba(255, 0, 0, 0.1) !important;
+}
+
+.debug-scroll-indicator {
+    background: rgba(255, 0, 0, 0.5) !important;
+    opacity: 1 !important;
+}
+
+/* ...existing code... */

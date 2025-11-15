@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { Activity, TrendingUp, Users, Phone, FileText, DollarSign, Award, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 import { DashboardChart } from '@/components/charts/DashboardChart';
 import { dashboardApi } from '@/apis/dashboard.api';
+import { Button } from '@/components/ui';
 
 interface DashboardStats {
   prescriptionCount: number;
@@ -32,7 +33,7 @@ interface TopDoctor {
 }
 
 export default function DashboardPage() {
-  const [stats, setStats] = useState<DashboardStats>({
+  const [stats, setStats] = useState < DashboardStats > ({
     prescriptionCount: 0,
     questionCount: 0,
     userCount: 0,
@@ -51,16 +52,16 @@ export default function DashboardPage() {
     categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
   });
 
-  const [systemStatus, setSystemStatus] = useState<SystemStatus>({
+  const [systemStatus, setSystemStatus] = useState < SystemStatus > ({
     status: 'checking',
     message: 'Đang kiểm tra...',
     lastCheck: new Date(),
     isOnline: navigator.onLine
   });
 
-  const [topDoctors, setTopDoctors] = useState<TopDoctor[]>([]);
+  const [topDoctors, setTopDoctors] = useState < TopDoctor[] > ([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState < string | null > (null);
 
   const statsCards = useMemo(() => [
     {
@@ -249,12 +250,11 @@ export default function DashboardPage() {
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-white/10 border border-white/20">
-              <div className={`h-3 w-3 rounded-full animate-gentle-pulse ${
-                systemStatus.status === 'good' ? 'bg-green-400 shadow-lg shadow-green-400/50' :
-                systemStatus.status === 'warning' ? 'bg-yellow-400 shadow-lg shadow-yellow-400/50' :
-                systemStatus.status === 'error' ? 'bg-red-500 shadow-lg shadow-red-500/50' :
-                'bg-gray-400'
-              }`} />
+              <div className={`h-3 w-3 rounded-full animate-gentle-pulse ${systemStatus.status === 'good' ? 'bg-green-400 shadow-lg shadow-green-400/50' :
+                  systemStatus.status === 'warning' ? 'bg-yellow-400 shadow-lg shadow-yellow-400/50' :
+                    systemStatus.status === 'error' ? 'bg-red-500 shadow-lg shadow-red-500/50' :
+                      'bg-gray-400'
+                }`} />
               <div className="text-sm">
                 <div className="font-medium">{systemStatus.message}</div>
                 <div className="opacity-60 text-xs">
@@ -262,15 +262,15 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
-            <button 
+            <Button
               onClick={fetchDashboardData}
               className="theme-toggle-btn"
               disabled={loading}
-              title="Làm mới"
               type="button"
+              variant="secondary"
             >
               <RefreshCw className={`h-5 w-5 ${loading ? 'animate-spin' : ''}`} />
-            </button>
+            </Button>
           </div>
         </div>
       </header>
@@ -280,8 +280,8 @@ export default function DashboardPage() {
         {/* Stats Cards */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {statsCards.map((card, index) => (
-            <div 
-              key={card.title} 
+            <div
+              key={card.title}
               className="liquid-glass-card group animate-slide-in-up"
               style={{ animationDelay: `${index * 0.1}s` }}
             >

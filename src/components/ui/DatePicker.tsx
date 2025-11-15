@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { DatePickerProps } from '@/types/global';
 import { Input } from './Input';
@@ -18,7 +18,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
     const [inputValue, setInputValue] = useState(value);
     const [showMonthSelector, setShowMonthSelector] = useState(false);
     const [showYearSelector, setShowYearSelector] = useState(false);
-    const containerRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef < HTMLDivElement > (null);
 
     // Initialize current date when value changes
     useEffect(() => {
@@ -34,28 +34,28 @@ const DatePicker: React.FC<DatePickerProps> = ({
         }
     }, [value]);
 
-    // Format date to YYYY-MM-DD string
-    const formatDate = (date: Date): string => {
+    // Memoize format date function to prevent recreation
+    const formatDate = useCallback((date: Date): string => {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
-    };
+    }, []);
 
-    // Handle calendar open/close
-    const toggleCalendar = () => {
+    // Handle calendar open/close with useCallback
+    const toggleCalendar = useCallback(() => {
         if (disabled) return;
-        setIsOpen(!isOpen);
+        setIsOpen(prev => !prev);
         setShowMonthSelector(false);
         setShowYearSelector(false);
-    };
+    }, [disabled]);
 
-    // Close calendar
-    const closeCalendar = () => {
+    // Close calendar with useCallback
+    const closeCalendar = useCallback(() => {
         setIsOpen(false);
         setShowMonthSelector(false);
         setShowYearSelector(false);
-    };
+    }, []);
 
     // Close calendar when clicking outside
     useEffect(() => {
@@ -72,20 +72,24 @@ const DatePicker: React.FC<DatePickerProps> = ({
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [isOpen]);
+    }, [isOpen, closeCalendar]);
 
-    // Handle date selection
-    const handleDateSelect = (day: number) => {
+    // Handle date selection with useCallback and prevent unnecessary operations
+    const handleDateSelect = useCallback((day: number) => {
         const newDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
         const formattedDate = formatDate(newDate);
-        setInputValue(formattedDate);
-        onChange(formattedDate);
+
+        // Only update if the date actually changed
+        if (formattedDate !== value) {
+            setInputValue(formattedDate);
+            onChange(formattedDate);
+        }
         setCurrentDate(newDate);
         closeCalendar();
-    };
+    }, [currentDate, formatDate, value, onChange, closeCalendar]);
 
-    // Navigation functions
-    const navigateMonth = (direction: 'prev' | 'next') => {
+    // Navigation functions with useCallback
+    const navigateMonth = useCallback((direction: 'prev' | 'next') => {
         setCurrentDate(prev => {
             const newDate = new Date(prev);
             if (direction === 'prev') {
@@ -95,10 +99,65 @@ const DatePicker: React.FC<DatePickerProps> = ({
             }
             return newDate;
         });
-    };
+    }, []);
 
-    // Get days in current month with proper grid
-    const getCalendarDays = () => {
+    // Handle month selection with useCallback
+    const handleMonthSelect = useCallback((monthIndex: number) => {
+        setCurrentDate(prev => {
+            const newDate = new Date(prev);
+            newDate.setMonth(monthIndex);
+            return newDate;
+        });
+        setShowMonthSelector(false);
+    }, []);
+
+    // Handle year selection with useCallback
+    const handleYearSelect = useCallback((year: number) => {
+        setCurrentDate(prev => {
+            const newDate = new Date(prev);
+            newDate.setFullYear(year);
+            return newDate;
+        });
+        setShowYearSelector(false);
+    }, []);
+
+    // Handle today selection with useCallback
+    const handleTodaySelect = useCallback(() => {
+        const today = new Date();
+        const formattedDate = formatDate(today);
+
+        // Only update if the date actually changed
+        if (formattedDate !== value) {
+            setInputValue(formattedDate);
+            onChange(formattedDate);
+        }
+        setCurrentDate(today);
+        closeCalendar();
+    }, [formatDate, value, onChange, closeCalendar]);
+
+    // Handle clear selection with useCallback
+    const handleClearSelection = useCallback(() => {
+        if (value) { // Only clear if there's actually a value
+            setInputValue('');
+            onChange('');
+        }
+        closeCalendar();
+    }, [value, onChange, closeCalendar]);
+
+    // Toggle month selector with useCallback
+    const toggleMonthSelector = useCallback(() => {
+        setShowMonthSelector(prev => !prev);
+        setShowYearSelector(false);
+    }, []);
+
+    // Toggle year selector with useCallback
+    const toggleYearSelector = useCallback(() => {
+        setShowYearSelector(prev => !prev);
+        setShowMonthSelector(false);
+    }, []);
+
+    // Memoize calendar days calculation
+    const calendarDays = useMemo(() => {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
         const firstDay = new Date(year, month, 1);
@@ -127,21 +186,26 @@ const DatePicker: React.FC<DatePickerProps> = ({
         }
 
         return days;
-    };
+    }, [currentDate, inputValue]);
 
-    const monthNames = [
+    // Memoize static arrays
+    const monthNames = useMemo(() => [
         'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
         'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
-    ];
+    ], []);
 
-    const shortMonthNames = [
+    const shortMonthNames = useMemo(() => [
         'T1', 'T2', 'T3', 'T4', 'T5', 'T6',
         'T7', 'T8', 'T9', 'T10', 'T11', 'T12'
-    ];
+    ], []);
 
-    const weekDays = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-    const currentYear = new Date().getFullYear();
-    const yearOptions = Array.from({ length: 21 }, (_, i) => currentYear - 10 + i);
+    const weekDays = useMemo(() => ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'], []);
+
+    // Memoize year options
+    const yearOptions = useMemo(() => {
+        const currentYear = new Date().getFullYear();
+        return Array.from({ length: 21 }, (_, i) => currentYear - 10 + i);
+    }, []);
 
     return (
         <div className={cn('relative', className)} ref={containerRef}>
@@ -156,7 +220,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
                 <div onClick={toggleCalendar} className="cursor-pointer">
                     <Input
                         value={inputValue}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         placeholder={placeholder}
                         disabled={disabled}
                         error={error}
@@ -170,23 +234,23 @@ const DatePicker: React.FC<DatePickerProps> = ({
                                 e.stopPropagation();
                                 toggleCalendar();
                             }}>
-                                <svg 
+                                <svg
                                     className={cn(
                                         "h-4 w-4 transition-all duration-200 cursor-pointer",
-                                        disabled 
-                                            ? "text-[var(--primary-text-secondary)] opacity-50" 
+                                        disabled
+                                            ? "text-[var(--primary-text-secondary)] opacity-50"
                                             : "text-[var(--primary-text-secondary)] hover:text-[var(--accent)]",
                                         isOpen && "text-[var(--accent)] rotate-180"
                                     )}
-                                    fill="none" 
-                                    stroke="currentColor" 
+                                    fill="none"
+                                    stroke="currentColor"
                                     viewBox="0 0 24 24"
                                 >
-                                    <path 
-                                        strokeLinecap="round" 
-                                        strokeLinejoin="round" 
-                                        strokeWidth={2} 
-                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" 
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                                     />
                                 </svg>
                             </div>
@@ -284,10 +348,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
 
                                         <div style={{ display: 'flex', gap: '8px' }}>
                                             <button
-                                                onClick={() => {
-                                                    setShowMonthSelector(!showMonthSelector);
-                                                    setShowYearSelector(false);
-                                                }}
+                                                onClick={toggleMonthSelector}
                                                 style={{
                                                     background: showMonthSelector ? 'var(--accent)' : 'transparent',
                                                     color: showMonthSelector ? 'white' : 'var(--primary-text)',
@@ -304,10 +365,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
                                             </button>
 
                                             <button
-                                                onClick={() => {
-                                                    setShowYearSelector(!showYearSelector);
-                                                    setShowMonthSelector(false);
-                                                }}
+                                                onClick={toggleYearSelector}
                                                 style={{
                                                     background: showYearSelector ? 'var(--accent)' : 'transparent',
                                                     color: showYearSelector ? 'white' : 'var(--primary-text)',
@@ -356,14 +414,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
                                             {shortMonthNames.map((monthName, index) => (
                                                 <button
                                                     key={index}
-                                                    onClick={() => {
-                                                        setCurrentDate(prev => {
-                                                            const newDate = new Date(prev);
-                                                            newDate.setMonth(index);
-                                                            return newDate;
-                                                        });
-                                                        setShowMonthSelector(false);
-                                                    }}
+                                                    onClick={() => handleMonthSelect(index)}
                                                     style={{
                                                         padding: '8px 4px',
                                                         fontSize: '11px',
@@ -413,14 +464,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
                                                 {yearOptions.map((year) => (
                                                     <button
                                                         key={year}
-                                                        onClick={() => {
-                                                            setCurrentDate(prev => {
-                                                                const newDate = new Date(prev);
-                                                                newDate.setFullYear(year);
-                                                                return newDate;
-                                                            });
-                                                            setShowYearSelector(false);
-                                                        }}
+                                                        onClick={() => handleYearSelect(year)}
                                                         style={{
                                                             padding: '6px',
                                                             fontSize: '11px',
@@ -481,7 +525,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
                                                 gridTemplateColumns: 'repeat(7, 1fr)',
                                                 gap: '2px'
                                             }}>
-                                                {getCalendarDays().map((calendarDay, index) => (
+                                                {calendarDays.map((calendarDay, index) => (
                                                     <button
                                                         key={index}
                                                         onClick={() => calendarDay.isCurrentMonth ? handleDateSelect(calendarDay.day) : undefined}
@@ -497,17 +541,17 @@ const DatePicker: React.FC<DatePickerProps> = ({
                                                             border: 'none',
                                                             borderRadius: '6px',
                                                             cursor: calendarDay.isCurrentMonth ? 'pointer' : 'not-allowed',
-                                                            color: calendarDay.isSelected 
+                                                            color: calendarDay.isSelected
                                                                 ? 'white'
-                                                                : calendarDay.isCurrentMonth 
-                                                                ? 'var(--primary-text)' 
-                                                                : 'var(--primary-text-secondary)',
+                                                                : calendarDay.isCurrentMonth
+                                                                    ? 'var(--primary-text)'
+                                                                    : 'var(--primary-text-secondary)',
                                                             opacity: calendarDay.isCurrentMonth ? 1 : 0.4,
-                                                            backgroundColor: calendarDay.isSelected 
-                                                                ? 'var(--accent)' 
-                                                                : calendarDay.isToday 
-                                                                ? 'rgba(52, 199, 89, 0.2)' 
-                                                                : 'transparent',
+                                                            backgroundColor: calendarDay.isSelected
+                                                                ? 'var(--accent)'
+                                                                : calendarDay.isToday
+                                                                    ? 'rgba(52, 199, 89, 0.2)'
+                                                                    : 'transparent',
                                                             transition: 'all 0.2s'
                                                         }}
                                                         onMouseOver={(e) => {
@@ -543,11 +587,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
                                         borderTop: '1px solid var(--card-border)'
                                     }}>
                                         <button
-                                            onClick={() => {
-                                                const today = new Date();
-                                                handleDateSelect(today.getDate());
-                                                setCurrentDate(today);
-                                            }}
+                                            onClick={handleTodaySelect}
                                             style={{
                                                 flex: 1,
                                                 background: 'var(--accent)',
@@ -565,11 +605,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
                                         </button>
 
                                         <button
-                                            onClick={() => {
-                                                setInputValue('');
-                                                onChange('');
-                                                closeCalendar();
-                                            }}
+                                            onClick={handleClearSelection}
                                             style={{
                                                 flex: 1,
                                                 background: 'transparent',

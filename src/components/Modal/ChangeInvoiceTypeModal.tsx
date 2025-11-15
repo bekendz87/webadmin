@@ -45,9 +45,14 @@ const ChangeInvoiceTypeModal: React.FC<ChangeInvoiceTypeModalProps> = ({
             return;
         }
 
-        if (selectedSource === 'transfer' && !ftCode.trim()) {
-            setError('Vui lòng nhập mã FT cho chuyển khoản.');
-            return;
+        if (selectedSource === 'transfer') {
+            console.log('selectedSource', selectedSource);
+
+            if (!ftCode.trim()) {
+                setError('Vui lòng nhập mã FT cho chuyển khoản.');
+                return;
+            }
+
         }
 
         onConfirm(selectedSource, ftCode);
@@ -58,6 +63,12 @@ const ChangeInvoiceTypeModal: React.FC<ChangeInvoiceTypeModalProps> = ({
             onClose();
         }
     };
+
+    const onChangeSource = (value: string) => {
+        console.log('Selected source value:', value);
+        setSelectedSource(value);
+        setError(''); // Clear any existing errors when source changes
+    }
 
     // Filter available sources to exclude current source
     const availableSources = CASHIER_CHANGE_SOURCES.filter(source =>
@@ -147,20 +158,20 @@ const ChangeInvoiceTypeModal: React.FC<ChangeInvoiceTypeModalProps> = ({
                         </label>
                         <div className="relative">
                             <Select
-                                id="source-select"
                                 value={selectedSource}
-                                onChange={setSelectedSource}
+                                onChange={onChangeSource}
                                 disabled={loading}
+                                placeholder="Chọn nguồn tiền mới"
                                 options={availableSources.map(item => ({
                                     key: item.key,
-                                    text: item.label,
-                                    value: item.label
+                                    value: item.key,
+                                    label: item.label
                                 }))}
                             />
 
                             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 9l-4-4 4 4m0 6l-4 4-4-4" />
                                 </svg>
                             </div>
                         </div>

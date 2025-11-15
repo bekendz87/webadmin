@@ -7,12 +7,13 @@ import { APP_CONFIG } from '@/constants/config';
 import * as ExaminationTypes from '@/types/examination';
 import Filter, { FilterField, ExportOption } from '@/components/Filter/Filter';
 import Pagination from '@/components/Pagination/Pagination';
-import { TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
 import { Button } from '@/components/ui/Button';
 import { useAlert } from '@/contexts/AlertContext';
 import { useNotification } from '@/contexts/NotificationContext';
 import { createNotification } from '@/utils/notification';
 import ExaminationDetailModal from '@/components/Modal/ExaminationDetailModal';
+
 
 const ExaminationReportPage: React.FC = () => {
     // State management - Fixed type annotations
@@ -620,8 +621,9 @@ const ExaminationReportPage: React.FC = () => {
                             </div>
                         ) : (
                             <div className="macos26-table-wrapper">
-                                <table className="macos26-table">
-                                    <thead className="macos26-table-head">
+                                <Table className="macos26-table" showScrollHint={true}
+                                    scrollHintText="Kéo ngang để xem thêm dữ liệu">
+                                    <TableHead className="macos26-table-head">
                                         <TableRow>
                                             <TableHead className="macos26-table-header-cell w-16">#</TableHead>
                                             <TableHead className="macos26-table-header-cell min-w-[120px]">Mã đơn hàng</TableHead>
@@ -642,7 +644,7 @@ const ExaminationReportPage: React.FC = () => {
                                             <TableHead className="macos26-table-header-cell min-w-[120px]">Ứng dụng</TableHead>
                                             <TableHead className="macos26-table-header-cell w-32">Thao tác</TableHead>
                                         </TableRow>
-                                    </thead>
+                                    </TableHead>
                                     <TableBody>
                                         {displayedRecords.length > 0 ? (
                                             displayedRecords.map((record, index) => (
@@ -747,16 +749,16 @@ const ExaminationReportPage: React.FC = () => {
                                             </TableRow>
                                         )}
                                     </TableBody>
-                                </table>
+                                </Table>
                             </div>
                         )}
                     </div>
-
+               
                     {/* Load More Button */}
                     {totalDisplayed < records.length && (
                         <div className="px-6 pb-6">
                             <div className="flex justify-center">
-                                <button
+                                <Button
                                     onClick={handleLoadMore}
                                     className="macos26-btn macos26-btn-secondary macos26-btn-md"
                                 >
@@ -764,7 +766,7 @@ const ExaminationReportPage: React.FC = () => {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                                     </svg>
                                     Tải thêm ({records.length - totalDisplayed} còn lại)
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     )}

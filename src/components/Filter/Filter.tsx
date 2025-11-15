@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/Button';
 import { DatePicker, Input, MultiSelect, Select } from '@/components/ui';
 import { Card, CardContent } from '@/components/ui/Card';
@@ -6,8 +6,9 @@ import { Badge } from '@/components/ui/Badge';
 
 export interface FilterOption {
     key: string;
+    value: string;
     text?: string;
-    value?: string;
+    label?: string;
 }
 
 export interface FilterField {
@@ -40,7 +41,7 @@ export interface FilterProps {
     exportOptions?: ExportOption[];
 }
 
-const Filter: React.FC<FilterProps> = ({
+const Filter: React.FC<FilterProps> = memo(({
     fields,
     onSubmit,
     onReset,
@@ -51,23 +52,27 @@ const Filter: React.FC<FilterProps> = ({
     onExport,
     exportOptions = []
 }) => {
-    // Default export options
-    const defaultExportOptions: ExportOption[] = [
-        {
-            type: 'excel',
-            label: 'Xuất Excel',
-            icon: (
-                <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                    <path fillRule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 001 1h6a1 1 0 001-1V3a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5z" clipRule="evenodd" />
-                </svg>
-            )
-        }
-    ];
+    // Memoize default export options
+    // const defaultExportOptions: ExportOption[] = useMemo(() => [
+    //     {
+    //         type: 'excel',
+    //         label: 'Xuất Excel',
+    //         icon: (
+    //             <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+    //                 <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+    //                 <path fillRule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 001 1h6a1 1 0 001-1V3a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5z" clipRule="evenodd" />
+    //             </svg>
+    //         )
+    //     }
+    // ], []);
 
-    const finalExportOptions = exportOptions.length > 0 ? exportOptions : defaultExportOptions;
+    const finalExportOptions = useMemo(() => 
+        exportOptions.length > 0 ? exportOptions : [],
+        [exportOptions, []]
+    );
 
-    const renderField = (field: FilterField) => {
+    // Memoize field rendering to avoid re-creation
+    const renderField = useCallback((field: FilterField) => {
         const baseProps = {
             disabled: field.disabled,
             placeholder: field.placeholder,
@@ -75,17 +80,12 @@ const Filter: React.FC<FilterProps> = ({
             required: false
         };
 
-        console.log('Rendering field:', field.name, field.type, field.value); // Debug log
-
         switch (field.type) {
             case 'date':
                 return (
                     <DatePicker
                         value={field.value as string}
-                        onChange={(newValue: string) => {
-                            console.log('DatePicker onChange:', newValue); // Debug
-                            field.onChange(newValue);
-                        }}
+                        onChange={field.onChange}
                         {...baseProps}
                     />
                 );
@@ -93,41 +93,42 @@ const Filter: React.FC<FilterProps> = ({
                 return (
                     <Input
                         value={field.value as string}
-                        onChange={(e) => {
-                            console.log('Input onChange:', e.target.value); // Debug
-                            field.onChange(e.target.value);
-                        }}
+                        onChange={(e) => field.onChange(e.target.value)}
                         {...baseProps}
                     />
                 );
             case 'select':
+                const selectOptions = useMemo(() => 
+                    (field.options || []).map(option => ({
+                        key: option.key || '',
+                        value: option.value || option.text || option.label || option.key || '',
+                        label: option.value || option.text || option.label || option.key || ''
+                    })).filter(option => option.key && option.value),
+                    [field.options]
+                );
+
                 return (
                     <Select
                         value={field.value as string}
-                        onChange={(newValue: string) => {
-                            console.log('Select onChange:', newValue); // Debug
-                            field.onChange(newValue);
-                        }}
-                        options={field.options?.map(option => ({
-                            key: option.key,
-                            value: option.value || option.text || option.key,
-                            label: option.text || option.value || option.key
-                        })) || []}
+                        onChange={field.onChange}
+                        options={selectOptions}
                         {...baseProps}
                     />
                 );
             case 'multiselect':
+                const multiSelectOptions = useMemo(() =>
+                    (field.options || []).map(option => ({
+                        key: option.key || '',
+                        value: option.value || option.text || option.label || option.key || ''
+                    })).filter(option => option.key && option.value),
+                    [field.options]
+                );
+
                 return (
                     <MultiSelect
-                        options={field.options?.map(option => ({
-                            key: option.key,
-                            value: option.value || option.text || option.key
-                        })) || []}
+                        options={multiSelectOptions}
                         value={field.value as string[]}
-                        onChange={(newValue: string[]) => {
-                            console.log('MultiSelect onChange:', newValue); // Debug
-                            field.onChange(newValue);
-                        }}
+                        onChange={field.onChange}
                         placeholder={field.placeholder || 'Chọn các tùy chọn...'}
                         disabled={field.disabled}
                         searchable={true}
@@ -135,13 +136,12 @@ const Filter: React.FC<FilterProps> = ({
                     />
                 );
             default:
-                console.warn('Unknown field type:', field.type);
                 return null;
         }
-    };
+    }, []);
 
-    // Group fields into rows
-    const groupFieldsIntoRows = (fields: FilterField[]) => {
+    // Memoize field grouping
+    const fieldRows = useMemo(() => {
         const rows: FilterField[][] = [];
         let currentRow: FilterField[] = [];
         let currentRowSpan = 0;
@@ -166,25 +166,26 @@ const Filter: React.FC<FilterProps> = ({
         }
 
         return rows;
-    };
+    }, [fields]);
 
-    const fieldRows = groupFieldsIntoRows(fields);
-
-    console.log('Filter render:', { fields: fields.length, fieldRows: fieldRows.length }); // Debug
+    // Memoize handlers
+    const handleExport = useCallback((type: 'excel' | 'pdf') => {
+        onExport?.(type);
+    }, [onExport]);
 
     return (
-        <div className="mb-8 animate-slide-in-up">
-            <Card variant="default" className="liquid-glass-card border-2 border-[var(--card-border)] shadow-xl">
-                <CardContent className="p-6">
+        <div className="filter-container">
+            <Card variant="default" className="filter-card">
+                <CardContent className="filter-content">
                     {/* Header */}
-                    <div className="flex items-center justify-between mb-8 pb-4 border-b-2 border-[var(--accent)]/20">
-                        <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--accent)] to-[var(--accent-secondary)] flex items-center justify-center">
+                    <div className="filter-header">
+                        <div className="filter-header-content">
+                            <div className="filter-icon">
                                 <svg className="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
                                 </svg>
                             </div>
-                            <h3 className="text-xl font-bold text-[var(--primary-text)] font-['SF_Pro_Display']">
+                            <h3 className="filter-title">
                                 {title}
                             </h3>
                         </div>
@@ -195,7 +196,7 @@ const Filter: React.FC<FilterProps> = ({
                             size="sm"
                             onClick={onReset}
                             disabled={loading}
-                            className="hover:bg-[var(--macos-red)]/10 hover:text-[var(--macos-red)] transition-all duration-200"
+                            className="filter-reset-btn"
                             leftIcon={
                                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -207,36 +208,38 @@ const Filter: React.FC<FilterProps> = ({
                     </div>
 
                     {/* Form Content */}
-                    <form onSubmit={onSubmit} className="space-y-6">
-                        {fieldRows.map((row, rowIndex) => (
-                            <div key={rowIndex} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                {row.map((field) => (
-                                    <div
-                                        key={field.name}
-                                        className={field.colSpan && field.colSpan > 1 ? 
-                                            `col-span-1 md:col-span-${Math.min(field.colSpan, 2)} lg:col-span-${Math.min(field.colSpan, 3)} xl:col-span-${field.colSpan}` : 
-                                            'col-span-1'
-                                        }
-                                    >
-                                        {renderField(field)}
-                                    </div>
-                                ))}
-                            </div>
-                        ))}
+                    <form onSubmit={onSubmit} className="filter-form">
+                        <div className="filter-fields">
+                            {fieldRows.map((row, rowIndex) => (
+                                <div key={rowIndex} className="filter-row">
+                                    {row.map((field) => (
+                                        <div
+                                            key={field.name}
+                                            className={`filter-field ${field.colSpan && field.colSpan > 1 ? 
+                                                `filter-field-span-${field.colSpan}` : 
+                                                'filter-field-span-1'
+                                            }`}
+                                        >
+                                            {renderField(field)}
+                                        </div>
+                                    ))}
+                                </div>
+                            ))}
+                        </div>
 
                         {/* Action Buttons */}
-                        <div className="flex flex-wrap items-center justify-end gap-4 pt-8 mt-8 border-t-2 border-[var(--card-border)]/30">
-                            <div className="flex gap-3">
+                        <div className="filter-actions">
+                            <div className="filter-buttons">
                                 {showExport && onExport && finalExportOptions.map((exportOption) => (
                                     <Button
                                         key={exportOption.type}
                                         type="button"
                                         variant="secondary"
                                         size="md"
-                                        onClick={() => onExport(exportOption.type)}
+                                        onClick={() => handleExport(exportOption.type)}
                                         disabled={loading}
                                         leftIcon={exportOption.icon}
-                                        className="hover:scale-105 transition-transform duration-200 shadow-lg"
+                                        className="filter-export-btn"
                                     >
                                         {exportOption.label}
                                     </Button>
@@ -248,7 +251,7 @@ const Filter: React.FC<FilterProps> = ({
                                     size="md"
                                     disabled={loading}
                                     loading={loading}
-                                    className="min-w-[140px] hover:scale-105 transition-transform duration-200 shadow-lg bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] hover:shadow-xl"
+                                    className="filter-submit-btn"
                                     leftIcon={
                                         !loading ? (
                                             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -264,8 +267,171 @@ const Filter: React.FC<FilterProps> = ({
                     </form>
                 </CardContent>
             </Card>
+
+            <style jsx>{`
+                .filter-container {
+                    margin-bottom: 2rem;
+                    will-change: transform;
+                    backface-visibility: hidden;
+                    transform: translateZ(0);
+                }
+
+                .filter-card {
+                    border: 2px solid var(--card-border);
+                    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+                    backdrop-filter: blur(16px);
+                    background: rgba(255, 255, 255, 0.95);
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+
+                .filter-content {
+                    padding: 1.5rem;
+                }
+
+                .filter-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-bottom: 2rem;
+                    padding-bottom: 1rem;
+                    border-bottom: 2px solid var(--accent);
+                    border-bottom-opacity: 0.2;
+                }
+
+                .filter-header-content {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                }
+
+                .filter-icon {
+                    width: 2rem;
+                    height: 2rem;
+                    border-radius: 0.5rem;
+                    background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .filter-title {
+                    font-size: 1.25rem;
+                    font-weight: 700;
+                    color: var(--primary-text);
+                    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+                }
+
+                .filter-reset-btn {
+                    transition: all 0.2s ease;
+                }
+
+                .filter-reset-btn:hover {
+                    background-color: rgba(239, 68, 68, 0.1);
+                    color: var(--macos-red);
+                }
+
+                .filter-form {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1.5rem;
+                }
+
+                .filter-fields {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1.5rem;
+                }
+
+                .filter-row {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                    gap: 1.5rem;
+                }
+
+                @media (min-width: 768px) {
+                    .filter-row {
+                        grid-template-columns: repeat(2, 1fr);
+                    }
+                }
+
+                @media (min-width: 1024px) {
+                    .filter-row {
+                        grid-template-columns: repeat(3, 1fr);
+                    }
+                }
+
+                @media (min-width: 1280px) {
+                    .filter-row {
+                        grid-template-columns: repeat(4, 1fr);
+                    }
+                }
+
+                .filter-field {
+                    min-width: 0;
+                }
+
+                .filter-field-span-2 {
+                    grid-column: span 2;
+                }
+
+                .filter-field-span-3 {
+                    grid-column: span 3;
+                }
+
+                .filter-field-span-4 {
+                    grid-column: span 4;
+                }
+
+                .filter-actions {
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-end;
+                    padding-top: 2rem;
+                    margin-top: 2rem;
+                    border-top: 2px solid var(--card-border);
+                    border-top-opacity: 0.3;
+                }
+
+                .filter-buttons {
+                    display: flex;
+                    gap: 0.75rem;
+                    flex-wrap: wrap;
+                }
+
+                .filter-export-btn {
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                }
+
+                .filter-export-btn:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.15);
+                }
+
+                .filter-submit-btn {
+                    min-width: 140px;
+                    background: linear-gradient(to right, var(--accent), var(--accent-secondary));
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                }
+
+                .filter-submit-btn:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+                }
+
+                @media (prefers-reduced-motion: reduce) {
+                    * {
+                        animation-duration: 0.01ms !important;
+                        animation-iteration-count: 1 !important;
+                        transition-duration: 0.01ms !important;
+                    }
+                }
+            `}</style>
         </div>
     );
-};
+});
+
+Filter.displayName = 'Filter';
 
 export default Filter;

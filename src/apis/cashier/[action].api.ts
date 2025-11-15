@@ -180,7 +180,11 @@ export default async function handler(
 
         console.log('Final Query String:', queryString);
 
-        const backendUrl = `${process.env.BACKEND_ADMIN_URL}${backendEndpoint}${queryString}`;
+        let backendUrl = `${process.env.BACKEND_ADMIN_URL}${backendEndpoint}${queryString}`;
+
+        if (cashierAction === 'change-type') {
+            backendUrl = `${process.env.BACKEND_URL}${backendEndpoint}${queryString}`;
+        }
         console.log('Calling backend:', backendUrl);
 
         // Build headers
@@ -218,7 +222,7 @@ export default async function handler(
             console.log('📤 Request body:', JSON.stringify(req.body, null, 2));
         }
 
-        const backendResponse: CashierReportResponse = <any> await request(requestOptions);
+        const backendResponse: CashierReportResponse = <any>await request(requestOptions);
 
         console.log('📥 Backend response:', backendResponse.result);
 

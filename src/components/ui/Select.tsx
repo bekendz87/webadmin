@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from './Button';
 import { Input } from './Input';
@@ -35,29 +35,53 @@ const Select: React.FC<SelectProps> = ({
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const containerRef = useRef<HTMLDivElement>(null);
-    const searchInputRef = useRef<HTMLInputElement>(null);
+    const containerRef = useRef < HTMLDivElement > (null);
+    const searchInputRef = useRef < HTMLInputElement > (null);
 
-    // Get selected option
-    const selectedOption = options.find(option => option.key === value || option.value === value);
-
-    // Filter options based on search term
-    const filteredOptions = options.filter(option =>
-        (option.value || option.label || '').toLowerCase().includes(searchTerm.toLowerCase())
+    // Memoize selected option to prevent recalculation
+    const selectedOption = useMemo(() =>
+        options.find(option => option.key === value || option.value === value),
+        [options, value]
     );
 
-    // Handle dropdown open/close
-    const toggleDropdown = () => {
-        if (disabled) return;
-        setIsOpen(!isOpen);
-        setSearchTerm('');
-    };
+    // Memoize filtered options to prevent recalculation on every render
+    const filteredOptions = useMemo(() =>
+        options.filter(option =>
+            (option.value || option.label || '').toLowerCase().includes(searchTerm.toLowerCase())
+        ),
+        [options, searchTerm]
+    );
 
-    // Close dropdown
-    const closeDropdown = () => {
+    // Completely isolated toggle dropdown - no external effects
+    const toggleDropdown = useCallback((e?: React.MouseEvent) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        if (disabled) return;
+
+        // Use functional update to prevent any external dependencies
+        setIsOpen(prevOpen => {
+            const newOpen = !prevOpen;
+            if (!newOpen) {
+                // Reset search when closing
+                setSearchTerm('');
+            }
+            return newOpen;
+        });
+    }, [disabled]);
+
+    // Isolated close dropdown
+    const closeDropdown = useCallback((e?: React.MouseEvent | MouseEvent) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
         setIsOpen(false);
         setSearchTerm('');
-    };
+    }, []);
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -74,22 +98,65 @@ const Select: React.FC<SelectProps> = ({
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [isOpen]);
+    }, [isOpen, closeDropdown]);
 
     // Focus search input when dropdown opens
     useEffect(() => {
         if (isOpen && searchInputRef.current && options.length > 5) {
-            setTimeout(() => {
+            const timer = setTimeout(() => {
                 searchInputRef.current?.focus();
             }, 100);
+            return () => clearTimeout(timer);
         }
     }, [isOpen, options.length]);
 
-    // Handle option selection
-    const handleOptionSelect = (optionValue: string, optionKey: string) => {
-        onChange(optionKey);
+    // Completely isolated option selection
+    const handleOptionSelect = useCallback((optionKey: string, e?: React.MouseEvent) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // Only call onChange if value actually changed - prevent unnecessary updates
+        if (optionKey !== value) {
+            // Use setTimeout to ensure UI updates before any potential parent effects
+            setTimeout(() => {
+                onChange(optionKey);
+            }, 0);
+        }
+
         closeDropdown();
-    };
+    }, [onChange, value, closeDropdown]);
+
+    // Isolated search change
+    const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setSearchTerm(e.target.value);
+    }, []);
+
+    // Isolated clear selection
+    const handleClearSelection = useCallback((e?: React.MouseEvent) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        if (value) { // Only clear if there's actually a value
+            // Use setTimeout to ensure UI updates before any potential parent effects
+            setTimeout(() => {
+                onChange('');
+            }, 0);
+        }
+        closeDropdown();
+    }, [onChange, value, closeDropdown]);
+
+    // Add click handler for the main button with complete isolation
+    const handleButtonClick = useCallback((e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleDropdown(e);
+    }, [toggleDropdown]);
 
     return (
         <div className={cn('relative', className)} ref={containerRef}>
@@ -103,7 +170,7 @@ const Select: React.FC<SelectProps> = ({
             <div className="relative">
                 <Button
                     variant="outline"
-                    onClick={toggleDropdown}
+                    onClick={handleButtonClick}
                     disabled={disabled}
                     aria-haspopup="listbox"
                     aria-expanded={isOpen}
@@ -140,12 +207,19 @@ const Select: React.FC<SelectProps> = ({
                         {/* Minimal Backdrop */}
                         <div
                             className="fixed inset-0 bg-black/10 backdrop-blur-sm z-[9998] flex items-center justify-center p-4"
-                            onClick={closeDropdown}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                closeDropdown(e);
+                            }}
                         >
                             {/* Dropdown Modal - Compact */}
                             <div
                                 className="relative animate-slideDown"
-                                onClick={(e) => e.stopPropagation()}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                }}
                                 style={{
                                     width: '100%',
                                     maxWidth: '400px',
@@ -183,9 +257,9 @@ const Select: React.FC<SelectProps> = ({
                                         }}>
                                             Chọn tùy chọn
                                         </h3>
-                                        
+
                                         <button
-                                            onClick={closeDropdown}
+                                            onClick={(e) => closeDropdown(e)}
                                             style={{
                                                 width: '24px',
                                                 height: '24px',
@@ -220,7 +294,7 @@ const Select: React.FC<SelectProps> = ({
                                             <Input
                                                 ref={searchInputRef}
                                                 value={searchTerm}
-                                                onChange={(e) => setSearchTerm(e.target.value)}
+                                                onChange={handleSearchChange}
                                                 placeholder="Tìm kiếm..."
                                                 size="sm"
                                                 leftIcon={
@@ -254,7 +328,7 @@ const Select: React.FC<SelectProps> = ({
                                                 {filteredOptions.map((option) => (
                                                     <button
                                                         key={option.key}
-                                                        onClick={() => !option.disabled && handleOptionSelect(option.value, option.key)}
+                                                        onClick={(e) => !option.disabled && handleOptionSelect(option.key, e)}
                                                         disabled={option.disabled}
                                                         style={{
                                                             width: '100%',
@@ -268,8 +342,8 @@ const Select: React.FC<SelectProps> = ({
                                                             color: (option.key === value || option.value === value)
                                                                 ? 'white'
                                                                 : option.disabled
-                                                                ? 'var(--primary-text-secondary)'
-                                                                : 'var(--primary-text)',
+                                                                    ? 'var(--primary-text-secondary)'
+                                                                    : 'var(--primary-text)',
                                                             fontSize: '13px',
                                                             fontWeight: '500',
                                                             textAlign: 'left',
@@ -304,12 +378,12 @@ const Select: React.FC<SelectProps> = ({
 
                                     {/* Clear Selection */}
                                     {selectedOption && (
-                                        <div style={{ 
+                                        <div style={{
                                             paddingTop: '8px',
-                                            borderTop: '1px solid var(--card-border)' 
+                                            borderTop: '1px solid var(--card-border)'
                                         }}>
                                             <button
-                                                onClick={() => handleOptionSelect('', '')}
+                                                onClick={(e) => handleClearSelection(e)}
                                                 style={{
                                                     width: '100%',
                                                     padding: '8px 12px',
@@ -347,10 +421,9 @@ const Select: React.FC<SelectProps> = ({
             </div>
 
             {error && (
-                <p className="mt-2 text-sm text-[var(--macos-red)] flex items-center gap-2">
-                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                <p className="mt-2 text-sm text-[var(--macos-red)] flex items-center gap-2">                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
                     {error}
                 </p>
             )}

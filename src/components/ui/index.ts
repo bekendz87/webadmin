@@ -3,6 +3,9 @@ export type { InputProps } from './Input';
 
 export { Button } from './Button';
 export type { ButtonProps } from './Button';
+import { Button } from './Button';
+import { Badge } from './Badge';
+import { Table } from './Table';
 
 export {
     Card,

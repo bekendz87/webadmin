@@ -147,12 +147,12 @@ const CashierReportPage: React.FC = () => {
         }
     };
 
-    const loadCashierReport = async (exportType, page) => {
+    const loadCashierReport = async (exportType: any, page: any) => {
         try {
             setLoading(true);
             setError(null);
 
-            const params = {
+            const params: any = {
                 page,
                 limit: limits,
                 stat: 'recharge',
@@ -269,7 +269,7 @@ const CashierReportPage: React.FC = () => {
                     showAlert('error', 'Lỗi tải dữ liệu', response?.message || 'Không thể tải dữ liệu báo cáo. Vui lòng thử lại.', 5000);
                 }
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error loading cashier report:', error);
             setData([]);
             setSummary(null);
@@ -315,22 +315,22 @@ const CashierReportPage: React.FC = () => {
         }, 100);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: any) => {
         e.preventDefault();
         loadCashierReport(undefined, 1);
     };
 
-    const handleExport = (type) => {
+    const handleExport = (type: any) => {
         if (!dateFrom || !dateTo) {
             if (showAlert) {
                 showAlert('warning', 'Thông báo', 'Bạn phải chọn ngày bắt đầu và kết thúc để xuất báo cáo.', 4000);
             }
             return;
         }
-        loadCashierReport(type);
+        loadCashierReport(type, 1);
     };
 
-    const handlePageChange = (page) => {
+    const handlePageChange = (page: any) => {
         loadCashierReport(undefined, page);
     };
 
@@ -388,12 +388,12 @@ const CashierReportPage: React.FC = () => {
             options: CASHIER_TYPES.map(item => ({
                 key: item.key,
                 text: item.label,
-                value: item.key
+                value: item.label
             })),
             colSpan: 1
         },
         {
-            type: 'multiselect',
+            type: 'select',
             name: 'selectedSources',
             label: 'Nạp từ',
             value: selectedSources,
@@ -407,7 +407,7 @@ const CashierReportPage: React.FC = () => {
             colSpan: 1
         },
         {
-            type: 'multiselect',
+            type: 'select',
             name: 'selectedGroups',
             label: 'Nhóm tài khoản tạo',
             value: selectedGroups,
@@ -429,7 +429,7 @@ const CashierReportPage: React.FC = () => {
             options: CASHIER_ACCOUNTING_OPTIONS.map(item => ({
                 key: item.key,
                 text: item.label,
-                value: item.key
+                value: item.label
             })),
             colSpan: 1
         },
@@ -509,31 +509,31 @@ const CashierReportPage: React.FC = () => {
     }, [summary]);
 
     // Add handler functions for the new buttons
-    const handleChangeInvoiceType = (invoice) => {
+    const handleChangeInvoiceType = (invoice: any) => {
         setSelectedChangeInvoice(invoice);
         setShowChangeTypeModal(true);
     };
 
-    const handlePrintInvoice = (invoice) => {
+    const handlePrintInvoice = (invoice: any) => {
         console.log('Print invoice for:', invoice.code);
         if (showAlert) {
             showAlert('info', 'Thông báo', 'Tính năng in hóa đơn đang được phát triển', 3000);
         }
     };
 
-    const handleOffset = (invoice) => {
+    const handleOffset = (invoice: any) => {
         setSelectedOffsetInvoice(invoice);
         setShowOffsetModal(true);
     };
 
-    const handleOffsetConfirm = async (amount) => {
+    const handleOffsetConfirm = async (amount: any) => {
         if (!selectedOffsetInvoice) { return; }
 
         try {
             setOffsetLoading(true);
             const token = getAuthToken();
 
-            const response = await request({
+            const response: any = await request({
                 method: 'POST',
                 url: `${API_ENDPOINTS.CASHIER.offset}`,
                 body: {
@@ -591,14 +591,14 @@ const CashierReportPage: React.FC = () => {
         }
     };
 
-    const handleChangeTypeConfirm = async (newType, ftCode) => {
+    const handleChangeTypeConfirm = async (newType: any, ftCode: any) => {
         if (!selectedChangeInvoice) return;
 
         try {
             setChangeTypeLoading(true);
             const token = getAuthToken();
 
-            const response = await request({
+            const response: any = await request({
                 method: 'POST',
                 url: `${API_ENDPOINTS.CASHIER.changeType}`,
                 body: {
@@ -739,7 +739,9 @@ const CashierReportPage: React.FC = () => {
                         <CardContent className="space-y-6">
                             {/* Summary Table with horizontal scroll */}
                             <div className="macos26-table-wrapper">
-                                <Table className="macos26-table">
+                                <Table className="macos26-table"
+                                    showScrollHint={true}
+                                    scrollHintText="Kéo ngang để xem thêm dữ liệu">
                                     <TableHeader className="macos26-table-head">
                                         <TableRow>
                                             <TableHead className="macos26-table-header-cell min-w-[120px]">#</TableHead>
@@ -980,7 +982,7 @@ const CashierReportPage: React.FC = () => {
                                                         )}
                                                         {record.cash_in_source === 'cash' && !record.totalcashMore && (
                                                             <Button
-                                                                variant="destructive"
+                                                                variant="danger"
                                                                 size="sm"
                                                                 onClick={() => handleOffset(record)}
                                                                 className="macos26-btn macos26-btn-danger macos26-btn-sm w-full"

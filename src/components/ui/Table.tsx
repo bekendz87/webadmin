@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { cn } from '@/utils/cn';
 
 export interface TableColumn {
@@ -37,22 +37,232 @@ export interface TableRowProps extends React.HTMLAttributes<HTMLTableRowElement>
 export interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableCellElement> { }
 export interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElement> { }
 
-// Main Table component
-const Table = React.forwardRef<HTMLTableElement, TableProps>(
-  ({ className, ...props }, ref) => (
-    <div className="relative w-full overflow-auto">
-      <table
-        ref={ref}
-        className={cn("w-full caption-bottom text-sm", className)}
-        {...props}
-      />
+// Hook for scroll detection
+const useScrollDetection = (containerRef: React.RefObject<HTMLDivElement>) => {
+  const [scrollState, setScrollState] = useState({
+    canScrollLeft: false,
+    canScrollRight: false,
+    isScrolling: false
+  });
+
+  const checkScrollability = useCallback(() => {
+    if (!containerRef.current) return;
+
+    const { scrollLeft, scrollWidth, clientWidth } = containerRef.current;
+    const canScrollLeft = scrollLeft > 0;
+    const canScrollRight = scrollLeft < scrollWidth - clientWidth - 1;
+
+    setScrollState(prev => ({
+      ...prev,
+      canScrollLeft,
+      canScrollRight
+    }));
+  }, [containerRef]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    let scrollTimeout: NodeJS.Timeout;
+
+    const handleScroll = () => {
+      setScrollState(prev => ({ ...prev, isScrolling: true }));
+      checkScrollability();
+
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        setScrollState(prev => ({ ...prev, isScrolling: false }));
+      }, 150);
+    };
+
+    const handleResize = () => {
+      checkScrollability();
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleResize);
+
+    // Initial check
+    checkScrollability();
+
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(scrollTimeout);
+    };
+  }, [containerRef, checkScrollability]);
+
+  return scrollState;
+};
+
+// Enhanced Table Wrapper component with debug mode
+const TableWrapper = React.forwardRef < HTMLDivElement, {
+  children: React.ReactNode;
+className ?: string;
+showScrollHint ?: boolean;
+scrollHintText ?: string;
+debug ?: boolean; // Add debug prop
+}> (({ children, className, showScrollHint = true, scrollHintText = "Scroll horizontally to view more", debug = false }, ref) => {
+  const containerRef = useRef < HTMLDivElement > (null);
+  const [showHint, setShowHint] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
+
+  const { canScrollLeft, canScrollRight, isScrolling } = useScrollDetection(containerRef);
+
+  // Debug: Log scroll state
+  useEffect(() => {
+    if (debug) {
+      console.log('Scroll state:', { canScrollLeft, canScrollRight, isScrolling });
+    }
+  }, [canScrollLeft, canScrollRight, isScrolling, debug]);
+
+  // Show hint initially if table is scrollable and user hasn't interacted
+  useEffect(() => {
+    if (!showScrollHint || hasInteracted || !canScrollRight || isScrolling) {
+      setShowHint(false);
+      return;
+    }
+
+    // Show hint after delay
+    const showTimer = setTimeout(() => {
+      if (!hasInteracted && canScrollRight) {
+        setShowHint(true);
+      }
+    }, 1500);
+
+    // Hide hint after showing for 4 seconds
+    const hideTimer = setTimeout(() => {
+      setShowHint(false);
+    }, 5500); // 1.5s delay + 4s show time
+
+    return () => {
+      clearTimeout(showTimer);
+      clearTimeout(hideTimer);
+    };
+  }, [canScrollRight, showScrollHint, hasInteracted, isScrolling]);
+
+  // Hide hint on user interaction
+  const handleUserInteraction = useCallback(() => {
+    setShowHint(false);
+    setHasInteracted(true);
+  }, []);
+
+  // Reset interaction state when table content changes significantly
+  useEffect(() => {
+    const resetTimer = setTimeout(() => {
+      if (!canScrollRight) {
+        setHasInteracted(false);
+      }
+    }, 2000);
+
+    return () => clearTimeout(resetTimer);
+  }, [canScrollRight]);
+
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        "table-wrapper-with-scroll",
+        debug && "debug-scroll-wrapper", // Add debug class
+        className
+      )}
+      onMouseEnter={handleUserInteraction}
+      onTouchStart={handleUserInteraction}
+    >
+      <div
+        ref={containerRef}
+        className="macos26-table-wrapper"
+        onScroll={handleUserInteraction}
+        onWheel={handleUserInteraction}
+        style={{
+          minWidth: '100%',
+          // Force minimum content width for testing
+          ...(debug ? { border: '2px solid blue' } : {})
+        }}
+      >
+        {children}
+      </div>
+
+      {/* Left scroll indicator */}
+      <div className={cn(
+        "table-scroll-indicator-left",
+        canScrollLeft && "visible",
+        debug && "debug-scroll-indicator"
+      )} />
+
+      {/* Right scroll indicator */}
+      <div className={cn(
+        "table-scroll-indicator-right",
+        canScrollRight && "visible",
+        debug && "debug-scroll-indicator"
+      )} />
+
+      {/* Scroll hint - only show when conditions are met */}
+      {showScrollHint && canScrollRight && !hasInteracted && (
+        <div className={cn(
+          "table-scroll-hint",
+          showHint && "visible",
+          showHint && "table-scroll-hint-animated"
+        )}>
+          <span className="scroll-hint-icon">
+            ←→ {scrollHintText}
+          </span>
+        </div>
+      )}
+
+      {/* Debug info */}
+      {debug && (
+        <div style={{
+          position: 'absolute',
+          top: '10px',
+          left: '10px',
+          background: 'rgba(0,0,0,0.8)',
+          color: 'white',
+          padding: '8px',
+          borderRadius: '4px',
+          fontSize: '12px',
+          zIndex: 1000,
+          pointerEvents: 'none'
+        }}>
+          L: {canScrollLeft ? '✓' : '✗'} | R: {canScrollRight ? '✓' : '✗'} | Scroll: {isScrolling ? '✓' : '✗'}
+        </div>
+      )}
     </div>
-  )
-);
+  );
+});
+TableWrapper.displayName = "TableWrapper";
+
+// Main Table component with debug prop
+const Table = React.forwardRef < HTMLTableElement, TableProps & {
+  showScrollHint?: boolean;
+  scrollHintText?: string;
+  debug?: boolean; // Add debug prop
+} > (({
+  className,
+  showScrollHint = true,
+  scrollHintText = "Kéo ngang để xem thêm",
+  debug = false, // Default debug to false
+  ...props
+}, ref) => (
+  <TableWrapper
+    showScrollHint={showScrollHint}
+    scrollHintText={scrollHintText}
+    debug={debug}
+  >
+    <table
+      ref={ref}
+      className={cn("macos26-table w-full caption-bottom text-sm", className)}
+      style={{
+        minWidth: debug ? '150%' : 'auto' // Force overflow in debug mode
+      }}
+      {...props}
+    />
+  </TableWrapper>
+));
 Table.displayName = "Table";
 
 // TableHeader component
-const TableHeader = React.forwardRef<HTMLTableSectionElement, TableHeaderProps>(
+const TableHeader = React.forwardRef < HTMLTableSectionElement, TableHeaderProps> (
   ({ className, ...props }, ref) => (
     <thead ref={ref} className={cn("macos26-table-head [&_tr]:border-b", className)} {...props} />
   )
@@ -60,7 +270,7 @@ const TableHeader = React.forwardRef<HTMLTableSectionElement, TableHeaderProps>(
 TableHeader.displayName = "TableHeader";
 
 // TableBody component with enhanced functionality
-const TableBody = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(
+const TableBody = React.forwardRef < HTMLTableSectionElement, TableBodyProps> (
   ({ className, data = [], loading = false, emptyText = "No data available", columns = [], renderRow, children, ...props }, ref) => {
     // If children are provided, render them directly (for custom table structure)
     if (children) {
@@ -117,7 +327,7 @@ const TableBody = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(
 TableBody.displayName = "TableBody";
 
 // TableRow component
-const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(
+const TableRow = React.forwardRef < HTMLTableRowElement, TableRowProps> (
   ({ className, ...props }, ref) => (
     <tr
       ref={ref}
@@ -132,7 +342,7 @@ const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(
 TableRow.displayName = "TableRow";
 
 // TableHead component
-const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
+const TableHead = React.forwardRef < HTMLTableCellElement, TableHeadProps> (
   ({ className, ...props }, ref) => (
     <th
       ref={ref}
@@ -147,7 +357,7 @@ const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
 TableHead.displayName = "TableHead";
 
 // TableCell component
-const TableCell = React.forwardRef<HTMLTableCellElement, TableCellProps>(
+const TableCell = React.forwardRef < HTMLTableCellElement, TableCellProps> (
   ({ className, ...props }, ref) => (
     <td
       ref={ref}
@@ -159,33 +369,34 @@ const TableCell = React.forwardRef<HTMLTableCellElement, TableCellProps>(
 TableCell.displayName = "TableCell";
 
 // TableCaption component
-const TableCaption = React.forwardRef<
+const TableCaption = React.forwardRef <
   HTMLTableCaptionElement,
   React.HTMLAttributes<HTMLTableCaptionElement>
->(({ className, ...props }, ref) => (
-  <caption
-    ref={ref}
-    className={cn("mt-4 text-sm text-muted-foreground", className)}
-    {...props}
-  />
-));
-TableCaption.displayName = "TableCaption";
+>(({className, ...props }, ref) => (
+    <caption
+      ref={ref}
+      className={cn("mt-4 text-sm text-muted-foreground", className)}
+      {...props}
+    />
+    ));
+    TableCaption.displayName = "TableCaption";
 
-export {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-  TableCaption,
+    export {
+      Table,
+      TableHeader,
+      TableBody,
+      TableRow,
+      TableHead,
+      TableCell,
+      TableCaption,
+      TableWrapper,
 };
 
-export type {
-  TableProps,
-  TableHeaderProps,
-  TableBodyProps,
-  TableRowProps,
-  TableHeadProps,
-  TableCellProps,
+    export type {
+      TableProps,
+      TableHeaderProps,
+      TableBodyProps,
+      TableRowProps,
+      TableHeadProps,
+      TableCellProps,
 };

@@ -862,6 +862,8 @@ const ScheduleAppointmentPage: React.FC = () => {
                                         emptyText="Chưa có dữ liệu đặt khám nào"
                                         rowKey="_id"
                                         className="macos26-table"
+                                        showScrollHint={true}
+                                        scrollHintText="Kéo ngang để xem thêm dữ liệu"
                                     />
                                 </div>
                             </div>
@@ -869,16 +871,15 @@ const ScheduleAppointmentPage: React.FC = () => {
                     </section>
 
                     {/* Pagination Section */}
-                    <section className="mt-8">
-                        <div className="macos26-info-card">
+                    {totalPages > 1 && (
+                        <div className="flex justify-center pt-6">
                             <Pagination
                                 currentPage={currentPage}
                                 totalPages={totalPages}
                                 onPageChange={handlePageChange}
-                                loading={loading}
                             />
                         </div>
-                    </section>
+                    )}
                 </div>
             </div>
         </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils/cn'; // Đổi từ '@/lib/utils' thành '@/utils/cn'
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   variant?: 'default' | 'error';
@@ -10,6 +10,7 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   helperText?: string;
   error?: string;
   required?: boolean;
+  size?: 'sm' | 'md' | 'lg';
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -17,6 +18,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     className, 
     type = 'text',
     variant = 'default',
+    size = 'md',
     leftIcon,
     rightIcon,
     rightElement,
@@ -52,6 +54,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             type={type}
             className={cn(
               'macos26-input',
+              size === 'sm' && 'macos26-input-sm',
+              size === 'lg' && 'macos26-input-lg',
               leftIcon && 'macos26-input-with-icon-left',
               (rightIcon || rightElement) && 'macos26-input-with-icon-right',
               hasError && 'macos26-input-error',

@@ -26,7 +26,11 @@ export const AutoLayout: React.FC<AutoLayoutProps> = ({ children }) => {
     PATHS.REPORT_INVOICE,
     PATHS.REPORT_HOSPITAL_APPOINTMENT,
     PATHS.REPORT_EXAMINATION,
-    PATHS.REPORT_CARD
+    PATHS.REPORT_CARD,
+    PATHS.REPORT_CASHIER,
+    PATHS.REPORT_DEBIT,
+    PATHS.REPORT_WITHDRAW,
+    PATHS.REPORT_RETURN_MONEY
   ];
 
   // Check if current path is a known protected route

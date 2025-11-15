@@ -6,6 +6,13 @@ export interface InvoiceUser {
     last_name?: string;
 }
 
+// Add debit info interface
+export interface DebitInfo {
+    type: 'top_up' | 'oh_card' | 'withdraw' | 'noi_4' | string;
+    serial?: string;
+    note?: string;
+}
+
 export interface InvoiceItem {
     _id: string;
     seq: number;
@@ -26,6 +33,8 @@ export interface InvoiceItem {
     moneyType?: 'payment' | 'refund' | 'cash-in';
     invoice_refund?: Array<{ code: string }>;
     amount_refund?: number; // Add this field for tracking total refunded amount
+    debit_info?: DebitInfo; // Add debit info
+    note?: string; // Add note field
 }
 
 export interface InvoiceReport {
@@ -50,6 +59,10 @@ export interface InvoiceListRequest {
     export?: 'excel' | 'pdf';
     show_all?: boolean;
     cache?: boolean; // Add this line
+    // Add debit-specific filters
+    debit_type?: string;
+    debit_serial?: string;
+    group?: string;
 }
 
 // Response interfaces
@@ -116,6 +129,12 @@ export interface DateOption {
     value: string;
 }
 
+// Debit types
+export interface DebitType {
+    value: string;
+    key: string;
+}
+
 // Constants
 export const INVOICE_TYPES: InvoiceType[] = [
     { value: "Tất cả", key: "all" },
@@ -177,6 +196,14 @@ export const DATE_OPTIONS: DateOption[] = [
     { key: 'custom_date', value: 'Tùy chọn ngày' }
 ];
 
+// Add debit constants
+export const DEBIT_TYPES: DebitType[] = [
+    { value: "Tất cả", key: "" },
+    { value: "Top up", key: "top_up" },
+    { value: "oh_card", key: "oh_card" },
+    { value: "Yêu cầu rút tiền", key: "withdraw" },
+];
+
 export const INVOICE_PAYMENT_TYPES = [
     "prescription", "paraclinical", "service", "promotion", "call_his", "chat",
     "appointment", "napas", "oh_foundation", "schedule_appointment", "debit",
@@ -193,5 +220,41 @@ export const INVOICE_REFUND_TYPES = [
 export const INVOICE_CASH_IN_TYPES = [
     "one_pay", "top-up", "oh_card", "epay_bank", "nganluong", "onepay_visa", "onepay_atm"
 ];
+export const INVOICE_TYPES_LABEL = {
+    TOP_UP: 'top-up',
+    ONE_PAY: 'one_pay',
+    OH_CARD: 'oh_card',
+    EPAY_BANK: 'epay_bank',
+    NGANLUONG: 'nganluong',
+    OH_FOUNDATION: 'oh_foundation',
+    ONEPAY_ATM: 'onepay_atm',
+    ONEPAY_VISA: 'onepay_visa',
+    DEBIT: 'debit',
+    NAPAS: 'napas'
+} as const;
+
+export const INVOICE_TYPE_LABELS: Record<string, string> = {
+    [INVOICE_TYPES_LABEL.TOP_UP]: 'Top up',
+    [INVOICE_TYPES_LABEL.ONE_PAY]: 'Nạp thẻ cào',
+    [INVOICE_TYPES_LABEL.OH_CARD]: 'Nạp OH Card',
+    [INVOICE_TYPES_LABEL.EPAY_BANK]: 'Nạp thẻ ATM - Epay',
+    [INVOICE_TYPES_LABEL.NGANLUONG]: 'Nạp thẻ (Visa/Master)-NL',
+    [INVOICE_TYPES_LABEL.OH_FOUNDATION]: 'Nạp thẻ DR.OH',
+    [INVOICE_TYPES_LABEL.ONEPAY_ATM]: 'OnePay ATM',
+    [INVOICE_TYPES_LABEL.ONEPAY_VISA]: 'OnePay VISA',
+    [INVOICE_TYPES_LABEL.DEBIT]: 'Trừ tiền',
+    [INVOICE_TYPES_LABEL.NAPAS]: 'Napas'
+};
+
+export const getInvoiceTypeLabel = (invoiceType: string, ohSerial?: string): string => {
+    const baseLabel = INVOICE_TYPE_LABELS[invoiceType] || invoiceType;
+    
+    if (invoiceType === INVOICE_TYPES_LABEL.OH_CARD && ohSerial) {
+        return `${baseLabel}(${ohSerial})`;
+    }
+    
+    return baseLabel;
+};
 
 export type InvoiceAction = 'list' | 'detail' | 'refund';
+export type DebitAction = 'list' | 'detail'; // Add debit actions

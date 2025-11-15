@@ -9,7 +9,7 @@ import Filter, { FilterField, ExportOption } from '@/components/Filter/Filter';
 import InvoiceDetailModal from '@/components/Modal/InvoiceDetailModal';
 import RefundModal from '@/components/Modal/RefundModal';
 import Pagination from '@/components/Pagination/Pagination';
-import { TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
+import { TableHeader, TableBody, TableRow, TableHead, TableCell, Table } from '@/components/ui/Table';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardContent } from '@/components/ui/Card';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/Alert';
@@ -114,71 +114,88 @@ const InvoicePage: React.FC = () => {
     const paymentUnits = InvoiceTypes.PAYMENT_UNITS || PAYMENT_UNITS_FALLBACK;
     const dateOptions = InvoiceTypes.DATE_OPTIONS || DATE_OPTIONS_FALLBACK;
 
-    // Define filter fields configuration
-    const filterFields: FilterField[] = useMemo(() => [
-        {
-            type: 'date',
-            name: 'dateFrom',
-            label: 'Từ Ngày',
-            value: dateFrom,
-            onChange: setDateFrom
-        },
-        {
-            type: 'date',
-            name: 'dateTo',
-            label: 'Đến Ngày',
-            value: dateTo,
-            onChange: setDateTo
-        },
-        {
-            type: 'text',
-            name: 'invoiceCode',
-            label: 'Mã HĐ',
-            placeholder: 'Nhập mã hóa đơn',
-            value: invoiceCode,
-            onChange: setInvoiceCode
-        },
-        {
-            type: 'text',
-            name: 'phoneCreator',
-            label: 'Tài khoản tạo',
-            placeholder: 'Nhập số điện thoại tạo',
-            value: phoneCreator,
-            onChange: setPhoneCreator
-        },
-        {
-            type: 'text',
-            name: 'phone',
-            label: 'Số điện thoại',
-            placeholder: 'Nhập số điện thoại',
-            value: phone,
-            onChange: setPhone
-        },
-        {
-            type: 'select',
-            name: 'selectedCate',
-            label: 'Loại',
-            value: selectedCate,
-            onChange: setSelectedCate,
-            options: cashTypes
-        },
-        {
-            type: 'select',
-            name: 'selectedPayment',
-            label: 'Thanh toán',
-            value: selectedPayment,
-            onChange: setSelectedPayment,
-            options: paymentTypes
-        },
-        {
-            type: 'select',
-            name: 'selectedType',
-            label: 'Dịch vụ',
-            value: selectedType,
-            onChange: setSelectedType,
-            options: invoiceTypes
-        }
-    ], [
+    // Define filter fields configuration with proper option formatting
+    const filterFields: FilterField[] = useMemo(() => {
+        return [
+            {
+                type: 'date',
+                name: 'dateFrom',
+                label: 'Từ Ngày',
+                value: dateFrom,
+                onChange: setDateFrom
+            },
+            {
+                type: 'date',
+                name: 'dateTo',
+                label: 'Đến Ngày',
+                value: dateTo,
+                onChange: setDateTo
+            },
+            {
+                type: 'text',
+                name: 'invoiceCode',
+                label: 'Mã HĐ',
+                placeholder: 'Nhập mã hóa đơn',
+                value: invoiceCode,
+                onChange: setInvoiceCode
+            },
+            {
+                type: 'text',
+                name: 'phoneCreator',
+                label: 'Tài khoản tạo',
+                placeholder: 'Nhập số điện thoại tạo',
+                value: phoneCreator,
+                onChange: setPhoneCreator
+            },
+            {
+                type: 'text',
+                name: 'phone',
+                label: 'Số điện thoại',
+                placeholder: 'Nhập số điện thoại',
+                value: phone,
+                onChange: setPhone
+            },
+            {
+                type: 'select',
+                name: 'selectedCate',
+                label: 'Loại',
+                value: selectedCate,
+                onChange: setSelectedCate,
+                // Ensure proper option format
+                options: cashTypes.map(type => ({
+                    key: type.key,
+                    value: type.value,
+                    text: type.value
+                }))
+            },
+            {
+                type: 'select',
+                name: 'selectedPayment',
+                label: 'Thanh toán',
+                value: selectedPayment,
+                onChange: setSelectedPayment,
+                // Ensure proper option format
+                options: paymentTypes.map(type => ({
+                    key: type.key,
+                    value: type.value,
+                    text: type.value
+                }))
+            },
+            {
+                type: 'select',
+                name: 'selectedType',
+                label: 'Dịch vụ',
+                value: selectedType,
+                onChange: setSelectedType,
+                // Ensure proper option format
+                options: invoiceTypes.map(type => ({
+                    key: type.key,
+                    value: type.value,
+                    text: type.value
+                }))
+            }
+        ];
+    }, [
         dateFrom, dateTo, invoiceCode, phoneCreator, phone, selectedCate, selectedPayment, selectedType,
         cashTypes, paymentTypes, invoiceTypes
     ]);
@@ -413,7 +430,7 @@ const InvoicePage: React.FC = () => {
                             4000
                         );
                     }
-                    if(processedList.length > 0){
+                    if (processedList.length > 0) {
                         await createNotification(
                             {
                                 title: 'Bạn vừa tải danh sách hóa đơn thành công',
@@ -422,8 +439,8 @@ const InvoicePage: React.FC = () => {
                             }
                         );
                     }
-                  
-                   
+
+
                 } else {
                     setList([]);
                     setError('Không có dữ liệu trả về');
@@ -771,7 +788,7 @@ const InvoicePage: React.FC = () => {
                 )}
 
                 {/* Filter Section - macOS 26 Card */}
-                <Card className="liquid-glass-card mb-8">
+                <Card className="macos26-header mb-8">
                     <Filter
                         fields={filterFields}
                         onSubmit={handleSubmit}
@@ -786,7 +803,7 @@ const InvoicePage: React.FC = () => {
                 </Card>
 
                 {/* Report Summary - macOS 26 Liquid Glass Cards */}
-                <Card className="liquid-glass-card mb-8">
+                <Card className="macos26-header mb-8">
                     <CardHeader>
                         <h3 className="macos-heading-3">Chi tiết báo cáo</h3>
                     </CardHeader>
@@ -880,7 +897,7 @@ const InvoicePage: React.FC = () => {
                 </Card>
 
                 {/* Table Section - macOS 26 Liquid Glass with Horizontal Scrolling */}
-                <Card className="liquid-glass-card">
+                <Card className="macos26-header mb-8">
                     <CardHeader>
                         <h3 className="macos-heading-3">Danh sách hóa đơn</h3>
                         <p className="macos-body-secondary text-sm mt-1">
@@ -896,7 +913,9 @@ const InvoicePage: React.FC = () => {
                         ) : (
                             <div className="table-container">
                                 <div className="macos26-table-wrapper">
-                                    <table className="macos26-table">
+                                    <Table className="macos26-table"
+                                        showScrollHint={true}
+                                        scrollHintText="Kéo ngang để xem thêm dữ liệu">
                                         <TableHeader className="macos26-table-head">
                                             <TableRow>
                                                 <TableHead className="macos26-table-header-cell w-16 sticky-column">#</TableHead>
@@ -1029,7 +1048,7 @@ const InvoicePage: React.FC = () => {
                                                 </TableRow>
                                             )}
                                         </TableBody>
-                                    </table>
+                                    </Table>
                                 </div>
                             </div>
                         )}
@@ -1037,19 +1056,15 @@ const InvoicePage: React.FC = () => {
                 </Card>
 
                 {/* Pagination - macOS 26 Style */}
-                <div className="mt-8">
-                    <Card className="liquid-glass-card">
-                        <CardContent className="p-4">
-                            <Pagination
-                                currentPage={currentPage}
-                                totalPages={totalPages}
-                                onPageChange={handlePageChange}
-                                loading={loading}
-                            />
-                        </CardContent>
-                    </Card>
-                </div>
-
+                {totalPages > 1 && (
+                    <div className="flex justify-center pt-6">
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                        />
+                    </div>
+                )}
                 {/* Modals - Already using proper components */}
                 <InvoiceDetailModal
                     isOpen={showDetailModal}

@@ -4,14 +4,13 @@ import * as InvoiceTypes from '@/types/invoice';
 import Modal from './Modal';
 import { Button } from '@/components/ui/Button';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
-
+import { getInvoiceTypeLabel } from "@/types/invoice"
 interface InvoiceDetailModalProps {
     isOpen: boolean;
     onClose: () => void;
     invoice: InvoiceTypes.InvoiceItem | null;
     invoiceDetail: any;
     loading: boolean;
-    getInvoiceTypeLabel: (type: string) => string;
 }
 
 export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({
@@ -20,7 +19,7 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({
     invoice,
     invoiceDetail,
     loading,
-    getInvoiceTypeLabel
+
 }) => {
 
     if (!invoice) return null;

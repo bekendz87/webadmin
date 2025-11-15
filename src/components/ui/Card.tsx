@@ -41,6 +41,39 @@ const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
 );
 CardHeader.displayName = 'CardHeader';
 
+const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
+  ({ className, ...props }, ref) => (
+    <h3
+      ref={ref}
+      className={cn('macos-heading-3', className)}
+      {...props}
+    />
+  )
+);
+CardTitle.displayName = 'CardTitle';
+
+const CardDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
+  ({ className, ...props }, ref) => (
+    <p
+      ref={ref}
+      className={cn('macos-body-secondary', className)}
+      {...props}
+    />
+  )
+);
+CardDescription.displayName = 'CardDescription';
+
+const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn('macos-card-body', className)}
+      {...props}
+    />
+  )
+);
+CardContent.displayName = 'CardContent';
+
 const CardBody = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
@@ -63,4 +96,40 @@ const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
 );
 CardFooter.displayName = 'CardFooter';
 
-export { Card, CardHeader, CardBody, CardFooter };
+// MacOS specific card components with enhanced styling
+const MacOSCard = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, variant = 'glass', children, ...props }, ref) => (
+    <Card
+      ref={ref}
+      className={className}
+      variant={variant}
+      {...props}
+    >
+      {children}
+    </Card>
+  )
+);
+MacOSCard.displayName = 'MacOSCard';
+
+const MacOSCardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn('macos-card-body', className)}
+      {...props}
+    />
+  )
+);
+MacOSCardContent.displayName = 'MacOSCardContent';
+
+export { 
+  Card, 
+  CardHeader, 
+  CardTitle, 
+  CardDescription, 
+  CardContent,
+  CardBody, 
+  CardFooter,
+  MacOSCard,
+  MacOSCardContent
+};

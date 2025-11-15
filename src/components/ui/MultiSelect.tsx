@@ -37,11 +37,9 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
     const [isOpen, setIsOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
-    const dropdownRef = useRef<HTMLDivElement>(null);
-    const triggerRef = useRef<HTMLButtonElement>(null);
-    const containerRef = useRef<HTMLDivElement>(null);
-
-    // Áp dụng cùng style compact như Select nhưng giữ logic multi-selection
+    const dropdownRef = useRef < HTMLDivElement > (null);
+    const triggerRef = useRef < HTMLButtonElement > (null);
+    const containerRef = useRef < HTMLDivElement > (null);
 
     // Filter options based on search term
     const filteredOptions = searchable
@@ -99,7 +97,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
         );
     };
 
-    // Handle option toggle
+    // Simplified option toggle without API calls
     const handleOptionToggle = (optionKey: string) => {
         if (disabled) return;
 
@@ -110,7 +108,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
         onChange(newValue);
     };
 
-    // Handle select all
+    // Simplified select all without API calls
     const handleSelectAll = () => {
         if (disabled) return;
 
@@ -125,7 +123,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
         }
     };
 
-    // Handle clear all
+    // Simplified clear all without API calls
     const handleClearAll = () => {
         if (disabled) return;
         onChange([]);
@@ -160,7 +158,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             const target = event.target as Node;
-            
+
             // Don't close if clicking inside dropdown or trigger
             if (
                 (containerRef.current && containerRef.current.contains(target)) ||
@@ -168,7 +166,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
             ) {
                 return;
             }
-            
+
             setIsOpen(false);
             setSearchTerm('');
         };
@@ -177,13 +175,13 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
             // Only close if scrolling outside the dropdown
             const target = event.target as Node;
             if (
-                dropdownRef.current && 
+                dropdownRef.current &&
                 (dropdownRef.current === target || dropdownRef.current.contains(target))
             ) {
                 // Scrolling inside dropdown, don't close
                 return;
             }
-            
+
             // Update position instead of closing
             calculateDropdownPosition();
         };
@@ -201,11 +199,11 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
         };
     }, [isOpen]);
 
-    // Handle button click
+    // Simplified button click without API calls
     const handleButtonClick = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        
+
         if (disabled) return;
 
         if (!isOpen) {
@@ -256,7 +254,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                 {/* Enhanced MultiSelect Dropdown */}
                 {isOpen && (
                     <>
-                        <div 
+                        <div
                             className="fixed inset-0 bg-black/5 backdrop-blur-[2px] z-[9998]"
                             onClick={() => setIsOpen(false)}
                         />
@@ -304,7 +302,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                                 </div>
 
                                 {/* Options with improved scroll handling */}
-                                <div 
+                                <div
                                     className="max-h-60 overflow-y-auto"
                                     onScroll={(e) => e.stopPropagation()} // Prevent scroll bubbling
                                 >
