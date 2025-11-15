@@ -6,12 +6,8 @@ export interface InvoiceUser {
     last_name?: string;
 }
 
-// Add debit info interface
-export interface DebitInfo {
-    type: 'top_up' | 'oh_card' | 'withdraw' | 'noi_4' | string;
-    serial?: string;
-    note?: string;
-}
+// Remove duplicate DebitInfo - use from debit.ts instead
+// export interface DebitInfo { ... } // REMOVED
 
 export interface InvoiceItem {
     _id: string;
@@ -33,7 +29,8 @@ export interface InvoiceItem {
     moneyType?: 'payment' | 'refund' | 'cash-in';
     invoice_refund?: Array<{ code: string }>;
     amount_refund?: number; // Add this field for tracking total refunded amount
-    debit_info?: DebitInfo; // Add debit info
+    // Import DebitInfo from debit.ts instead
+    debit_info?: any; // Will be typed properly when importing from debit
     note?: string; // Add note field
 }
 
@@ -59,10 +56,8 @@ export interface InvoiceListRequest {
     export?: 'excel' | 'pdf';
     show_all?: boolean;
     cache?: boolean; // Add this line
-    // Add debit-specific filters
-    debit_type?: string;
-    debit_serial?: string;
-    group?: string;
+    // Remove debit-specific filters - these belong in debit.ts
+    // group?: string;
 }
 
 // Response interfaces
@@ -196,13 +191,8 @@ export const DATE_OPTIONS: DateOption[] = [
     { key: 'custom_date', value: 'Tùy chọn ngày' }
 ];
 
-// Add debit constants
-export const DEBIT_TYPES: DebitType[] = [
-    { value: "Tất cả", key: "" },
-    { value: "Top up", key: "top_up" },
-    { value: "oh_card", key: "oh_card" },
-    { value: "Yêu cầu rút tiền", key: "withdraw" },
-];
+// Remove duplicate DEBIT_TYPES - use from debit.ts instead
+// export const DEBIT_TYPES: DebitType[] = [ ... ] // REMOVED
 
 export const INVOICE_PAYMENT_TYPES = [
     "prescription", "paraclinical", "service", "promotion", "call_his", "chat",
@@ -257,4 +247,5 @@ export const getInvoiceTypeLabel = (invoiceType: string, ohSerial?: string): str
 };
 
 export type InvoiceAction = 'list' | 'detail' | 'refund';
-export type DebitAction = 'list' | 'detail'; // Add debit actions
+// Remove DebitAction - use from debit.ts instead
+// export type DebitAction = 'list' | 'detail'; // REMOVED
