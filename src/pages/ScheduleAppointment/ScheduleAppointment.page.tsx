@@ -7,7 +7,8 @@ import { APP_CONFIG } from '@/constants/config';
 import * as ScheduleAppointmentTypes from '@/types/scheduleAppointment';
 import Filter, { FilterField, ExportOption } from '@/components/Filter/Filter';
 import Pagination from '@/components/Pagination/Pagination';
-import { Table, TableColumn } from '@/components/ui/Table';
+// Update imports to use specific components
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
 import { Badge } from '@/components/ui/Badge';
 import { useAlert } from '@/contexts/AlertContext';
 import { useNotification } from '@/contexts/NotificationContext';
@@ -856,15 +857,120 @@ const ScheduleAppointmentPage: React.FC = () => {
                             <div className="macos-card-body">
                                 <div className="macos26-table-wrapper">
                                     <Table
-                                        columns={columns}
-                                        data={list}
-                                        loading={loading}
-                                        emptyText="Chưa có dữ liệu đặt khám nào"
-                                        rowKey="_id"
                                         className="macos26-table"
                                         showScrollHint={true}
                                         scrollHintText="Kéo ngang để xem thêm dữ liệu"
-                                    />
+                                    >
+                                        <TableHeader className="macos26-table-head">
+                                            <TableRow>
+                                                <TableHead className="macos26-table-header-cell w-16">#</TableHead>
+                                                <TableHead className="macos26-table-header-cell min-w-[120px]">Mã Đặt Khám</TableHead>
+                                                <TableHead className="macos26-table-header-cell min-w-[120px]">Mã Bệnh Nhân</TableHead>
+                                                <TableHead className="macos26-table-header-cell min-w-[120px]">Bệnh viện</TableHead>
+                                                <TableHead className="macos26-table-header-cell min-w-[140px]">Mã Hóa đơn</TableHead>
+                                                <TableHead className="macos26-table-header-cell min-w-[140px]">Tài khoản sử dụng</TableHead>
+                                                <TableHead className="macos26-table-header-cell min-w-[160px]">Người sử dụng</TableHead>
+                                                <TableHead className="macos26-table-header-cell min-w-[120px]">Ngày tạo</TableHead>
+                                                <TableHead className="macos26-table-header-cell min-w-[120px]">Phí đặt khám</TableHead>
+                                                <TableHead className="macos26-table-header-cell min-w-[120px]">Phí khám</TableHead>
+                                                <TableHead className="macos26-table-header-cell min-w-[120px]">Khuyến mãi</TableHead>
+                                                <TableHead className="macos26-table-header-cell min-w-[140px]">Số tiền thanh toán</TableHead>
+                                                <TableHead className="macos26-table-header-cell min-w-[120px]">Hoàn tiền</TableHead>
+                                                <TableHead className="macos26-table-header-cell min-w-[120px]">Mã hoàn tiền</TableHead>
+                                                <TableHead className="macos26-table-header-cell min-w-[140px]">Loại</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {loading ? (
+                                                <TableRow>
+                                                    <TableCell colSpan={15} className="text-center py-12">
+                                                        <div className="flex flex-col items-center justify-center space-y-4">
+                                                            <div className="w-8 h-8 border-2 border-gray-300 border-t-green-500 rounded-full animate-spin"></div>
+                                                            <p className="macos-body-secondary">Đang tải dữ liệu...</p>
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ) : list.length === 0 ? (
+                                                <TableRow>
+                                                    <TableCell colSpan={15} className="text-center py-12">
+                                                        <div className="flex flex-col items-center justify-center space-y-4">
+                                                            <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                            </svg>
+                                                            <div className="text-center">
+                                                                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                                                                    Chưa có dữ liệu đặt khám nào
+                                                                </h3>
+                                                                <p className="text-gray-500 dark:text-gray-400">
+                                                                    Hãy thử thay đổi bộ lọc để tìm kiếm dữ liệu
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ) : (
+                                                list.map((item, index) => (
+                                                    <TableRow key={item._id || index} className="macos26-table-row">
+                                                        <TableCell className="macos26-table-cell text-center">
+                                                            {(currentPage - 1) * limit + index + 1}
+                                                        </TableCell>
+                                                        <TableCell className="macos26-table-cell">
+                                                            <span className="font-medium">{item.appoint_code || ''}</span>
+                                                        </TableCell>
+                                                        <TableCell className="macos26-table-cell">
+                                                            {item.patient_code || ''}
+                                                        </TableCell>
+                                                        <TableCell className="macos26-table-cell">
+                                                            <Badge variant="default">
+                                                                {getSourceLabel(item.source || '')}
+                                                            </Badge>
+                                                        </TableCell>
+                                                        <TableCell className="macos26-table-cell">
+                                                            <span className="font-medium">{item.code}</span>
+                                                        </TableCell>
+                                                        <TableCell className="macos26-table-cell">
+                                                            {item.user?.username || ''}
+                                                        </TableCell>
+                                                        <TableCell className="macos26-table-cell">
+                                                            {`${item.user?.last_name || ''} ${item.user?.first_name || ''}`.trim()}
+                                                        </TableCell>
+                                                        <TableCell className="macos26-table-cell">
+                                                            {formatDate(item.created_time)}
+                                                        </TableCell>
+                                                        <TableCell className="macos26-table-cell">
+                                                            {formatCurrency(item.book_price || 0)}
+                                                        </TableCell>
+                                                        <TableCell className="macos26-table-cell">
+                                                            {formatCurrency(item.exam_price || 0)}
+                                                        </TableCell>
+                                                        <TableCell className="macos26-table-cell">
+                                                            {formatCurrency(item.discountCredit || 0)}
+                                                        </TableCell>
+                                                        <TableCell className="macos26-table-cell">
+                                                            {item.invoiceType === 'schedule_appointment' ?
+                                                                formatCurrency(item.totalCredit) :
+                                                                '0'
+                                                            }
+                                                        </TableCell>
+                                                        <TableCell className="macos26-table-cell">
+                                                            {item.invoiceType === 'refund_schedule_appointment' ?
+                                                                formatCurrency(item.totalCredit) :
+                                                                '0'
+                                                            }
+                                                        </TableCell>
+                                                        <TableCell className="macos26-table-cell">
+                                                            {item.note || ''}
+                                                        </TableCell>
+                                                        <TableCell className="macos26-table-cell">
+                                                            <Badge variant="primary">
+                                                                {getInvoiceTypeLabel(item.invoiceType)}
+                                                            </Badge>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))
+                                            )}
+                                        </TableBody>
+                                    </Table>
                                 </div>
                             </div>
                         </div>
