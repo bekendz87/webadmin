@@ -32,7 +32,7 @@ export function ThemeToggle() {
       onClick={toggleTheme}
       aria-label="Toggle theme"
       type="button"
-      className="macos26-btn macos26-btn-ghost macos26-btn-sm macos26-theme-toggle"
+      className="macos26-btn macos26-btn-ghost macos26-btn-sm"
     >
       {theme === 'dark' ? (
         <Sun className="h-4 w-4" />

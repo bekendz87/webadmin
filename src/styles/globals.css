@@ -71,13 +71,69 @@ body {
     --alert-error-border: rgba(255, 59, 48, 0.25);
     --alert-error-glow: rgba(255, 59, 48, 0.15);
 
-    /* Z-index layers - Set to extremely high values */
-    --z-dropdown: 99999;
-    --z-modal: 100000;
-    --z-overlay: 100100;
-    --z-toast: 100300;
-    --z-tooltip: 100400;
-    --z-alert: 100500;
+    /* Z-index layers - Adjusted hierarchy */
+    --z-sidebar: 60;
+    --z-header: 40;
+    --z-floating-toggle: 55;
+    --z-dropdown: 70;
+    --z-modal: 80;
+    --z-overlay: 85;
+    --z-toast: 90;
+    --z-tooltip: 95;
+    --z-alert: 100;
+
+    /* Responsive breakpoints */
+    --mobile-xs: 320px;
+    --mobile-sm: 375px;
+    --mobile-lg: 414px;
+    --tablet-sm: 768px;
+    --tablet-lg: 1024px;
+    --desktop-sm: 1280px;
+    --desktop-lg: 1440px;
+    --desktop-xl: 1920px;
+    --desktop-xxl: 2560px;
+
+    /* Reduced Dynamic spacing - scaled down by ~15% */
+    --spacing-xs: 0.2rem;
+    --spacing-sm: 0.4rem;
+    --spacing-md: 0.85rem;
+    --spacing-lg: 1.25rem;
+    --spacing-xl: 1.7rem;
+    --spacing-2xl: 2.5rem;
+
+    /* Reduced Dynamic text sizes - scaled down by ~10% */
+    --text-xs: 0.675rem;
+    --text-sm: 0.775rem;
+    --text-base: 0.9rem;
+    --text-lg: 1rem;
+    --text-xl: 1.125rem;
+    --text-2xl: 1.35rem;
+    --text-3xl: 1.675rem;
+    --text-4xl: 2rem;
+
+    /* Reduced Component sizes - scaled down by ~12% */
+    --btn-height-sm: 1.75rem;
+    --btn-height-md: 2.2rem;
+    --btn-height-lg: 2.65rem;
+    --btn-height-xl: 3.1rem;
+
+    --input-height-sm: 1.75rem;
+    --input-height-md: 2.4rem;
+    --input-height-lg: 2.85rem;
+    --input-height-xl: 3.3rem;
+
+    /* Reduced Card padding - scaled down by ~15% */
+    --card-padding-sm: 0.85rem;
+    --card-padding-md: 1.25rem;
+    --card-padding-lg: 1.7rem;
+    --card-padding-xl: 2.1rem;
+
+    /* Reduced Border radius - scaled down by ~10% */
+    --radius-sm: 0.45rem;
+    --radius-md: 0.675rem;
+    --radius-lg: 0.9rem;
+    --radius-xl: 1.35rem;
+    --radius-2xl: 1.8rem;
 }
 
 /* Dark theme - macOS inspired */
@@ -654,7 +710,8 @@ html.dark body {
         box-shadow: var(--glass-shadow);
         position: sticky;
         top: 1rem;
-        z-index: 50;
+        z-index: var(--z-header);
+        /* Reduced from 50 to 40 */
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -1718,6 +1775,7 @@ html.dark body {
             var(--glass-shadow),
             0 20px 25px -5px rgba(0, 0, 0, 0.1);
         z-index: var(--z-dropdown);
+        /* Updated to use variable */
         max-height: 24rem;
         overflow: hidden;
         animation: slideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1821,6 +1879,7 @@ html.dark body {
             var(--glass-shadow),
             0 20px 25px -5px rgba(0, 0, 0, 0.1);
         z-index: var(--z-dropdown);
+        /* Updated to use variable */
         animation: slideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         overflow: hidden;
     }
@@ -1923,6 +1982,7 @@ html.dark body {
             var(--glass-shadow),
             0 20px 25px -5px rgba(0, 0, 0, 0.1);
         z-index: var(--z-dropdown);
+        /* Updated to use variable */
         animation: slideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         overflow: hidden;
     }
@@ -3529,555 +3589,334 @@ html.dark body {
             right: 0.875rem;
         }
     }
-}
 
-/* Enhanced animations for new components */
-
-/* Loading spinner enhancements */
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* Badge hover effects */
-.badge-interactive {
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-}
-
-.badge-interactive:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--glass-shadow);
-}
-
-/* Empty state animations */
-.empty-state-enter {
-    animation: emptyStateSlideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes emptyStateSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(30px) scale(0.9);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-/* ...existing code... */
-
-/* Enhanced macOS26 Loading States */
-.loading-spinner {
-    width: 2rem;
-    height: 2rem;
-    border: 3px solid transparent;
-    border-top: 3px solid var(--accent);
-    border-right: 3px solid var(--accent);
-    border-radius: 50%;
-    animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
-    position: relative;
-}
-
-.loading-spinner::before {
-
-    content: '';
-    position: absolute;
-    inset: -3px;
-    border: 1px solid var(--glass-border);
-    border-radius: 50%;
-    background: var(--glass-bg);
-    backdrop-filter: var(--backdrop-blur);
-    -webkit-backdrop-filter: var(--backdrop-blur);
-}
-
-@keyframes liquidFlow {
-    0% {
-        background-position: 0% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
-    }
-
-    100% {
-        background-position: 0% 50%;
-    }
-}
-
-/* Enhanced macOS26 Slide Animations */
-.macos-slide-up {
-    animation: macosSlideUpEnhanced 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.macos-slide-down {
-    animation: macosSlideDownEnhanced 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes macosSlideUpEnhanced {
-    from {
-        opacity: 0;
-        transform: translateY(30px) scale(0.95);
-        backdrop-filter: blur(0px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
+    /* Enhanced Theme Toggle Styles */
+    .macos26-theme-toggle {
+        position: relative;
+        background: var(--card-bg);
         backdrop-filter: var(--backdrop-blur);
+        -webkit-backdrop-filter: var(--backdrop-blur);
+        border: 1px solid var(--card-border);
+        border-radius: 50% !important;
+        width: 2.5rem !important;
+        height: 2.5rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: var(--glass-shadow);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
     }
-}
 
-@keyframes macosSlideDownEnhanced {
-    from {
-        opacity: 0;
-        transform: translateY(-20px) scale(0.98);
+    .macos26-theme-toggle::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        pointer-events: none;
+        border-radius: 50% 50% 0 0;
     }
 
-    to {
+    .macos26-theme-toggle:hover {
+        transform: translateY(-1px) scale(1.05);
+        box-shadow:
+            var(--glass-shadow),
+            0 8px 25px rgba(0, 0, 0, 0.15);
+        border-color: var(--accent);
+    }
+
+    /* Enhanced Floating Toggle Button */
+    .floating-sidebar-toggle {
+        position: fixed;
+        top: 1.5rem;
+        left: 1.5rem;
+        z-index: 9999;
+        background: var(--card-bg);
+        backdrop-filter: var(--backdrop-blur);
+        -webkit-backdrop-filter: var(--backdrop-blur);
+        border: 2px solid var(--card-border);
+        border-radius: 1rem;
+        width: 3rem;
+        height: 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow:
+            var(--glass-shadow),
+            0 12px 30px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        overflow: hidden;
+    }
+
+    .floating-sidebar-toggle::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+        pointer-events: none;
+        border-radius: 1rem 1rem 0 0;
+    }
+
+    .floating-sidebar-toggle:hover {
+        transform: translateY(-2px) scale(1.1);
+        box-shadow:
+            var(--glass-shadow),
+            0 16px 40px rgba(0, 0, 0, 0.25),
+            0 0 30px var(--accent);
+        border-color: var(--accent);
+    }
+
+    .floating-sidebar-toggle:active {
+        transform: translateY(-1px) scale(1.05);
+    }
+
+    /* Icon container for better alignment */
+    .icon-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        position: relative;
+    }
+
+    /* Enhanced icon visibility */
+    .floating-sidebar-toggle .icon-container svg,
+    .macos26-theme-toggle .icon-container svg {
+        color: var(--primary-text);
+        transition: all 0.3s ease;
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+    }
+
+    .floating-sidebar-toggle:hover .icon-container svg,
+    .macos26-theme-toggle:hover .icon-container svg {
+        color: var(--accent);
+        transform: scale(1.1);
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    }
+
+    /* Animation for theme toggle icons */
+    .theme-icon-sun,
+    .theme-icon-moon {
+        position: absolute;
+        inset: 0;
+        width: 1rem;
+        height: 1rem;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Light mode - show sun, hide moon */
+    .theme-light .theme-icon-sun {
         opacity: 1;
-        transform: translateY(0) scale(1);
+        transform: rotate(0deg) scale(1);
+    }
+
+    .theme-light .theme-icon-moon {
+        opacity: 0;
+        transform: rotate(90deg) scale(0.5);
+    }
+
+    /* Dark mode - show moon, hide sun */
+    .theme-dark .theme-icon-sun {
+        opacity: 0;
+        transform: rotate(-90deg) scale(0.5);
+    }
+
+    .theme-dark .theme-icon-moon {
+        opacity: 1;
+        transform: rotate(0deg) scale(1);
+    }
+
+    /* Mobile responsive adjustments */
+    @media (max-width: 768px) {
+        .floating-sidebar-toggle {
+            top: 1rem;
+            left: 1rem;
+            width: 2.75rem;
+            height: 2.75rem;
+        }
+
+        .macos26-theme-toggle {
+            width: 2.25rem !important;
+            height: 2.25rem !important;
+        }
+    }
+
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+
+        .floating-sidebar-toggle,
+        .macos26-theme-toggle {
+            border-width: 3px;
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+    }
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+
+        .floating-sidebar-toggle,
+        .macos26-theme-toggle,
+        .theme-icon-sun,
+        .theme-icon-moon {
+            transition: none;
+            animation: none;
+        }
+
+        .floating-sidebar-toggle:hover,
+        .macos26-theme-toggle:hover {
+            transform: none;
+        }
+    }
+
+    /* Enhanced floating sidebar toggle */
+    .floating-toggle-button {
+        position: fixed;
+        top: 1.5rem;
+        left: 1.5rem;
+        z-index: var(--z-floating-toggle);
+        /* Set to 55 */
+        width: 3rem;
+        height: 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--card-bg);
+        backdrop-filter: var(--backdrop-blur);
+        -webkit-backdrop-filter: var(--backdrop-blur);
+        border: 2px solid var(--card-border);
+        border-radius: 1rem;
+        box-shadow:
+            var(--glass-shadow),
+            0 12px 30px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        outline: none;
+        overflow: hidden;
+    }
+
+    .floating-toggle-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+        pointer-events: none;
+        border-radius: 1rem 1rem 0 0;
+    }
+
+    .floating-toggle-button:hover {
+        transform: translateY(-2px) scale(1.1);
+        box-shadow:
+            var(--glass-shadow),
+            0 16px 40px rgba(0, 0, 0, 0.25),
+            0 0 30px var(--accent)/20;
+        border-color: var(--accent);
+        background: var(--glass-bg);
+    }
+
+    .floating-toggle-button:active {
+        transform: translateY(-1px) scale(1.05);
+    }
+
+    /* Ensure icon visibility */
+    .floating-toggle-button svg {
+        width: 1.25rem;
+        height: 1.25rem;
+        color: var(--primary-text);
+        transition: all 0.3s ease;
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+    }
+
+    .floating-toggle-button:hover svg {
+        color: var(--accent);
+        transform: scale(1.1);
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    }
+
+    /* Dark mode adjustments */
+    .dark .floating-toggle-button {
+        background: var(--card-bg);
+        border-color: var(--card-border);
+    }
+
+    .dark .floating-toggle-button:hover {
+        background: var(--glass-bg);
+        border-color: var(--accent);
+    }
+
+    .dark .floating-toggle-button svg {
+        color: var(--primary-text);
+    }
+
+    .dark .floating-toggle-button:hover svg {
+        color: var(--accent);
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .floating-toggle-button {
+            display: none;
+            /* Hide on mobile since we use different logic */
+        }
+    }
+
+    /* Sidebar specific z-index utilities */
+    .sidebar-container {
+        z-index: var(--z-sidebar) !important;
+        /* Set to 60 */
+    }
+
+    /* Mobile backdrop for sidebar */
+    .sidebar-backdrop {
+        z-index: calc(var(--z-sidebar) - 5) !important;
+        /* Set to 55 */
+    }
+
+    /* Desktop floating toggle button - Updated */
+    .desktop-toggle-btn {
+        z-index: var(--z-floating-toggle) !important;
+        /* Set to 55 */
+        backdrop-filter: var(--backdrop-blur);
+        -webkit-backdrop-filter: var(--backdrop-blur);
+        box-shadow:
+            var(--glass-shadow),
+            0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Header specific z-index */
+    .header-container {
+        z-index: var(--z-header) !important;
+        /* Set to 40 */
+    }
+
+    /* Dropdown containers - Higher than sidebar */
+    .dropdown-container {
+        z-index: var(--z-dropdown) !important;
+        /* Set to 70 */
+    }
+
+    /* Animation optimizations */
+    .sidebar-transition {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: transform, width;
+    }
+
+    /* Content protection */
+    .content-area {
+        min-width: 0;
+        flex: 1;
+        overflow-x: auto;
     }
 }
-
-/* Enhanced macOS26 Card System */
-.macos-card-elevated {
-    box-shadow:
-        var(--glass-shadow),
-        0 25px 50px rgba(0, 0, 0, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    transform: translateY(-4px);
-    border: 1px solid var(--glass-border);
-    background: var(--card-bg);
-    backdrop-filter: var(--backdrop-blur);
-    -webkit-backdrop-filter: var(--backdrop-blur);
-}
-
-/* macOS26 Text Utilities */
-.macos-text-primary {
-    color: var(--primary-text);
-}
-
-.macos-text-secondary {
-    color: var(--primary-text-secondary);
-}
-
-.macos-text-accent {
-    color: var(--accent);
-}
-
-.macos-text-gradient {
-    background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-/* macOS26 Pagination Styles */
-.pagination-container {
-    width: 100%;
-    margin: 2rem 0;
-}
-
-.pagination-card {
-    padding: 1.5rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.pagination-info {
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--card-border);
-}
-
-.pagination-stats {
-    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-    color: var(--primary-text-secondary);
-}
-
-.quick-jump-input {
-    @apply macos26-input;
-    font-size: 0.875rem;
-    text-align: center;
-}
-
-.quick-jump-btn {
-    @apply macos26-btn-sm macos26-btn-secondary;
-    min-width: 2rem;
-}
-
-.pagination-controls {
-    margin-top: 1rem;
-}
-
-.pagination-btn-nav {
-    @apply macos26-btn-sm macos26-btn-secondary;
-    min-width: 4rem;
-}
-
-.pagination-btn {
-    @apply macos26-btn-sm;
-    min-width: 2.5rem;
-    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
-    font-variant-numeric: tabular-nums;
-}
-
-.pagination-btn-active {
-    @apply macos26-btn-primary;
-    box-shadow:
-        0 4px 12px rgba(52, 199, 89, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-}
-
-.pagination-btn-number {
-    background: var(--card-bg);
-    border-color: var(--card-border);
-}
-
-.pagination-btn-number:hover {
-    background: var(--glass-bg);
-    transform: translateY(-1px);
-}
-
-.pagination-btn-mobile {
-    @apply macos26-btn-sm macos26-btn-secondary;
-    min-width: 2.5rem;
-}
-
-.pagination-dots {
-    color: var(--primary-text-secondary);
-    font-weight: 500;
-}
-
-.mobile-page-indicator {
-    background: var(--glass-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 0.5rem;
-    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
-    font-variant-numeric: tabular-nums;
-}
-
-.current-page {
-    color: var(--accent);
-    font-weight: 600;
-}
-
-.page-separator {
-    color: var(--primary-text-secondary);
-}
-
-.total-pages {
-    color: var(--primary-text);
-    font-weight: 500;
-}
-
-.pagination-loading {
-    border-radius: 1.25rem;
-}
-
-/* Enhanced macOS26 Background System */
-.macos-login-bg {
-    background: var(--primary-bg);
-    position: relative;
-}
-
-.macos-login-bg::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background:
-        linear-gradient(135deg, rgba(52, 199, 89, 0.06) 0%, transparent 50%),
-        linear-gradient(225deg, rgba(0, 122, 255, 0.05) 0%, transparent 40%),
-        linear-gradient(315deg, rgba(48, 176, 199, 0.04) 0%, transparent 45%);
-    pointer-events: none;
-    z-index: -1;
-}
-
-.dark .macos-login-bg::before {
-    background:
-        linear-gradient(135deg, rgba(52, 199, 89, 0.03) 0%, transparent 50%),
-        linear-gradient(225deg, rgba(10, 132, 255, 0.025) 0%, transparent 40%),
-        linear-gradient(315deg, rgba(6, 182, 212, 0.02) 0%, transparent 45%);
-}
-
-/* macOS26 Interface Base */
-.macos-interface {
-    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Satoshi', 'Inter', system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-}
-
-.macos-app {
-    background: var(--primary-bg);
-    min-height: 100vh;
-    position: relative;
-}
-
-.macos-app {
-    background: var(--primary-bg);
-    min-height: 100vh;
-    position: relative;
-}
-
-/* Enhanced macOS26 Table Styles - Improved visibility for both themes */
-.macos26-table-wrapper {
-    background: rgba(255, 255, 255, 0.85);
-    border: 2px solid rgba(0, 0, 0, 0.15);
-    border-radius: 1.25rem;
-    box-shadow:
-        var(--glass-shadow),
-        0 4px 20px rgba(0, 0, 0, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
-}
-
-.dark .macos26-table-wrapper {
-    background: var(--card-bg);
-    border: 2px solid var(--card-border);
-    scrollbar-color: var(--card-border) transparent;
-}
-
-.macos26-table-wrapper::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
-    pointer-events: none;
-    z-index: 2;
-}
-
-/* Enhanced scrollbar styling for better visibility */
-.macos26-table-wrapper::-webkit-scrollbar {
-    height: 12px;
-}
-
-.macos26-table-wrapper::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.05);
-    border-radius: 0 0 1.25rem 1.25rem;
-    margin: 0 1rem;
-}
-
-.macos26-table-wrapper::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2));
-    border-radius: 6px;
-    border: 2px solid transparent;
-    background-clip: content-box;
-    transition: background 0.2s ease;
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.2);
-}
-
-.macos26-table-wrapper::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, var(--accent), rgba(52, 199, 89, 0.8));
-    box-shadow:
-        inset 0 0 6px rgba(0, 0, 0, 0.3),
-        0 0 8px var(--accent);
-}
-
-/* Dark mode scrollbar */
-.dark .macos26-table-wrapper::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.dark .macos26-table-wrapper::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, var(--card-border), rgba(255, 255, 255, 0.1));
-    box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.1);
-}
-
-.dark .macos26-table-wrapper::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, var(--accent), rgba(52, 199, 89, 0.8));
-    box-shadow:
-        inset 0 0 6px rgba(255, 255, 255, 0.2),
-        0 0 8px var(--accent);
-}
-
-/* Enhanced scroll indicators with better visibility */
-.table-scroll-indicator-left,
-.table-scroll-indicator-right {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 3rem;
-    pointer-events: none;
-    z-index: 10;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.table-scroll-indicator-left {
-    left: 0;
-    background: linear-gradient(90deg,
-            rgba(255, 255, 255, 0.95),
-            rgba(255, 255, 255, 0.7),
-            transparent);
-}
-
-.table-scroll-indicator-right {
-    right: 0;
-    background: linear-gradient(270deg,
-            rgba(255, 255, 255, 0.95),
-            rgba(255, 255, 255, 0.7),
-            transparent);
-}
-
-/* Dark mode indicators */
-.dark .table-scroll-indicator-left {
-    background: linear-gradient(90deg,
-            var(--card-bg),
-            rgba(0, 0, 0, 0.4),
-            transparent);
-}
-
-.dark .table-scroll-indicator-right {
-    background: linear-gradient(270deg,
-            var(--card-bg),
-            rgba(0, 0, 0, 0.4),
-            transparent);
-}
-
-.table-scroll-indicator-left.visible,
-.table-scroll-indicator-right.visible {
-    opacity: 1;
-}
-
-/* Enhanced scroll hint with better styling */
-.table-scroll-hint {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: var(--backdrop-blur);
-    -webkit-backdrop-filter: var(--backdrop-blur);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 1rem 1rem 0 0;
-    padding: 0.75rem 1.25rem;
-    font-size: 0.75rem;
-    color: white;
-    z-index: 15;
-    opacity: 0;
-    transform: translateX(-50%) translateY(100%);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    pointer-events: none;
-    white-space: nowrap;
-    font-weight: 500;
-    box-shadow:
-        0 8px 25px rgba(0, 0, 0, 0.3),
-        0 0 20px rgba(0, 0, 0, 0.1);
-}
-
-/* Dark mode hint */
-.dark .table-scroll-hint {
-    background: rgba(255, 255, 255, 0.9);
-    color: var(--primary-text);
-    border-color: rgba(0, 0, 0, 0.1);
-    box-shadow:
-        0 8px 25px rgba(0, 0, 0, 0.5),
-        0 0 20px rgba(255, 255, 255, 0.1);
-}
-
-.table-scroll-hint.visible {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-}
-
-.table-scroll-hint::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    pointer-events: none;
-}
-
-/* Enhanced wrapper container */
-.table-wrapper-with-scroll {
-    position: relative;
-    overflow: hidden;
-    border-radius: 1.25rem;
-    /* Add subtle glow effect */
-    box-shadow:
-        0 0 0 1px rgba(0, 0, 0, 0.1),
-        0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-.dark .table-wrapper-with-scroll {
-    box-shadow:
-        0 0 0 1px var(--card-border),
-        var(--glass-shadow);
-}
-
-.table-wrapper-with-scroll::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 2px;
-    background: linear-gradient(135deg,
-            rgba(0, 0, 0, 0.1),
-            transparent,
-            rgba(0, 0, 0, 0.1));
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: xor;
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    pointer-events: none;
-}
-
-.dark .table-wrapper-with-scroll::after {
-    background: linear-gradient(135deg,
-            var(--card-border),
-            transparent,
-            var(--card-border));
-}
-
-/* Enhanced hover effects for table wrapper */
-.table-wrapper-with-scroll:hover .macos26-table-wrapper {
-    border-color: rgba(0, 0, 0, 0.2);
-    box-shadow:
-        var(--glass-shadow),
-        0 8px 30px rgba(0, 0, 0, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.4);
-}
-
-.dark .table-wrapper-with-scroll:hover .macos26-table-wrapper {
-    border-color: var(--accent);
-    box-shadow:
-        var(--glass-shadow),
-        0 8px 30px rgba(0, 0, 0, 0.3),
-        0 0 20px rgba(52, 199, 89, 0.1);
-}
-
-/* Force visibility for testing - remove this after confirming it works */
-.debug-scroll-wrapper {
-    border: 3px solid red !important;
-    background: rgba(255, 0, 0, 0.1) !important;
-}
-
-.debug-scroll-indicator {
-    background: rgba(255, 0, 0, 0.5) !important;
-    opacity: 1 !important;
-}
-
-/* ...existing code... */
