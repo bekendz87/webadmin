@@ -17,15 +17,26 @@ export function Sidebar() {
   const { setIsOpen, isOpen, isMobile, toggleSidebar } = useSidebarContext();
   const { permissions } = useAuth();
   const { theme } = useTheme();
-  const [expandedItems, setExpandedItems] = useState < string[] > ([]);
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
+  // Fixed toggle function - only toggle the specific item
   const toggleExpanded = (title: string) => {
-    setExpandedItems((prev) => (prev.includes(title) ? [] : [title]));
+    setExpandedItems((prev) => {
+      if (prev.includes(title)) {
+        return prev.filter(item => item !== title);
+      } else {
+        return [...prev, title];
+      }
+    });
   };
 
   const toggleCollapsed = () => {
     setIsCollapsed(!isCollapsed);
+    // Close all expanded items when collapsing
+    if (!isCollapsed) {
+      setExpandedItems([]);
+    }
   };
 
   const openSidebar = () => {
@@ -36,17 +47,28 @@ export function Sidebar() {
     }
   };
 
+  // Auto-expand parent menu if current page is a submenu item
   useEffect(() => {
+    const currentExpandedItems: string[] = [];
+    
     NAV_DATA.forEach((section) => {
       section.items.forEach((item) => {
         if (item.items?.some((subItem) => subItem.url === location.pathname)) {
           if (!expandedItems.includes(item.title)) {
-            setExpandedItems(prev => [...prev, item.title]);
+            currentExpandedItems.push(item.title);
           }
         }
       });
     });
-  }, [location.pathname]);
+
+    // Only update if there are new items to expand
+    if (currentExpandedItems.length > 0) {
+      setExpandedItems(prev => {
+        const newItems = currentExpandedItems.filter(item => !prev.includes(item));
+        return newItems.length > 0 ? [...prev, ...newItems] : prev;
+      });
+    }
+  }, [location.pathname]); // Remove expandedItems from dependencies
 
   const hasPermission = (permission: any) => {
     if (!permission) return true;
@@ -245,37 +267,40 @@ export function Sidebar() {
                                     />
                                   </MacOS26MenuItem>
 
-                                  {/* Submenu */}
+                                  {/* Submenu with proper animation */}
                                   <div
                                     className={cn(
                                       "overflow-hidden transition-all duration-400 ease-out",
                                       expandedItems.includes(item.title)
-                                        ? "max-h-screen opacity-100 mt-1"
-                                        : "max-h-0 opacity-0 mt-0"
+                                        ? "max-h-96 opacity-100"
+                                        : "max-h-0 opacity-0"
                                     )}
-                                  ></div>
-                                  <div className="sidebar-submenu-container ml-3 pl-3 space-y-0.5">
-                                    {item.items.map((subItem) => {
-                                      if (!hasPermission(subItem.permission)) return null;
-                                      return (
-                                        <div key={subItem.title} className="submenu-item">
-                                          <MacOS26MenuItem
-                                            as="link"
-                                            href={subItem.url}
-                                            isActive={location.pathname === subItem.url}
-                                            onClick={() => isMobile && toggleSidebar()}
-                                            isSubmenu
-                                          >
-                                            <span className="text-xs font-medium truncate w-full">
-                                              {subItem.title}
-                                            </span>
-                                          </MacOS26MenuItem>
-                                        </div>
-                                      );
-                                    })}
+                                  >
+                                    <div className={cn(
+                                      "ml-3 pl-3 space-y-0.5 sidebar-submenu-container",
+                                      expandedItems.includes(item.title) && "submenu-expanded"
+                                    )}>
+                                      {item.items.map((subItem) => {
+                                        if (!hasPermission(subItem.permission)) return null;
+                                        return (
+                                          <div key={subItem.title} className="submenu-item">
+                                            <MacOS26MenuItem
+                                              as="link"
+                                              href={subItem.url}
+                                              isActive={location.pathname === subItem.url}
+                                              onClick={() => isMobile && toggleSidebar()}
+                                              isSubmenu
+                                            >
+                                              <span className="text-xs font-medium truncate w-full">
+                                                {subItem.title}
+                                              </span>
+                                            </MacOS26MenuItem>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
                                   </div>
                                 </div>
-
                               ) : (
                                 <MacOS26MenuItem
                                   as="link"

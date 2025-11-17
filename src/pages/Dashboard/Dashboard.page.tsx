@@ -251,18 +251,21 @@ export default function DashboardPage() {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-white/10 border border-white/20">
               <div className={`h-3 w-3 rounded-full animate-gentle-pulse ${systemStatus.status === 'good' ? 'bg-green-400 shadow-lg shadow-green-400/50' :
-                  systemStatus.status === 'warning' ? 'bg-yellow-400 shadow-lg shadow-yellow-400/50' :
-                    systemStatus.status === 'error' ? 'bg-red-500 shadow-lg shadow-red-500/50' :
-                      'bg-gray-400'
+                systemStatus.status === 'warning' ? 'bg-yellow-400 shadow-lg shadow-yellow-400/50' :
+                  systemStatus.status === 'error' ? 'bg-red-500 shadow-lg shadow-red-500/50' :
+                    'bg-gray-400'
                 }`} />
               <div className="text-sm">
-                <div className="font-medium">{systemStatus.message}</div>
-                <div className="opacity-60 text-xs">
-                  {systemStatus.lastCheck.toLocaleTimeString()}
-                </div>
+                <button onClick={fetchDashboardData}>
+                  <div className="font-medium">{systemStatus.message}</div>
+                  <div className="opacity-60 text-xs">
+                    {systemStatus.lastCheck.toLocaleTimeString()}
+
+                  </div>
+                </button>
               </div>
             </div>
-            <Button
+            {/* <Button
               onClick={fetchDashboardData}
               className="theme-toggle-btn"
               disabled={loading}
@@ -270,7 +273,7 @@ export default function DashboardPage() {
               variant="secondary"
             >
               <RefreshCw className={`h-5 w-5 ${loading ? 'animate-spin' : ''}`} />
-            </Button>
+            </Button> */}
           </div>
         </div>
       </header>

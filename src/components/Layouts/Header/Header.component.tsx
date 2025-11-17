@@ -15,7 +15,7 @@ export function Header() {
   const navData = NAV_DATA;
 
   return (
-    <header className="macos26-header">
+    <header className="macos26-header" style={{ zIndex: 40 }}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           {isMobile && (
@@ -27,8 +27,6 @@ export function Header() {
               <Menu className="h-4 w-4" />
             </button>
           )}
-
-
         </div>
 
         <div className="flex-1 max-w-xl mx-6 hidden md:block">

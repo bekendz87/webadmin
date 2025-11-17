@@ -19,12 +19,12 @@ import {
 } from '@/components/ui/Table';
 
 const OtpPage: React.FC = () => {
-    const [list, setList] = useState<OtpItem[]>([]);
+    const [list, setList] = useState < OtpItem[] > ([]);
     const [phoneSearch, setPhoneSearch] = useState('');
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState < string | null > (null);
     const [limit] = useState(100);
-    const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const debounceTimeoutRef = useRef < NodeJS.Timeout | null > (null);
 
     const { showAlert } = useAlert();
     const { refreshNotifications } = useNotification();
@@ -74,7 +74,7 @@ const OtpPage: React.FC = () => {
                 3000
             );
 
-            const response = await request<OtpApiResponse>({
+            const response = await request < OtpApiResponse > ({
                 method: 'GET',
                 url: `${API_ENDPOINTS.OTP}/list`,
                 params
@@ -93,7 +93,7 @@ const OtpPage: React.FC = () => {
                     );
 
                     try {
-                        await request<NotificationApiResponse>({
+                        await request < NotificationApiResponse > ({
                             method: 'POST',
                             url: '/api/notification/create',
                             headers: getRequestHeaders(),
@@ -255,19 +255,19 @@ const OtpPage: React.FC = () => {
 
     return (
         <div className="macos-liquid-glass">
-            <div className="p-6 space-y-6">
+            <div className="p-3 sm:p-6 space-y-4 sm:space-y-6">
                 {/* Header Card */}
                 <Card className="macos26-header">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                        <div className="mb-4 sm:mb-0">
-                            <h1 className="text-2xl font-bold text-var(--primary-text) mb-2">
+                    <div className="header-mobile-stack sm:flex sm:flex-row sm:items-center sm:justify-between">
+                        <div className="header-title-mobile mb-4 sm:mb-0">
+                            <h1 className="text-xl sm:text-2xl font-bold text-var(--primary-text) mb-2">
                                 Quản lý OTP
                             </h1>
-                            <p className="text-var(--primary-text-secondary)">
+                            <p className="text-sm sm:text-base text-var(--primary-text-secondary)">
                                 Danh sách các mã OTP được tạo cho xác thực số điện thoại
                             </p>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="header-actions-mobile sm:flex sm:items-center sm:gap-3">
                             <Button
                                 onClick={handleRefresh}
                                 variant="secondary"
@@ -288,80 +288,130 @@ const OtpPage: React.FC = () => {
                 {/* Search Card */}
                 <Card className="liquid-glass-card">
                     <div className="text-center mb-6">
-                        <div className="w-16 h-16 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-blue-400/30">
-                            <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-blue-400/30">
+                            <svg className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
-                        <h3 className="text-xl font-semibold text-var(--primary-text) mb-2">
+                        <h3 className="text-lg sm:text-xl font-semibold text-var(--primary-text) mb-2">
                             Tìm kiếm OTP
                         </h3>
-                        <p className="text-var(--primary-text-secondary)">
+                        <p className="text-sm sm:text-base text-var(--primary-text-secondary)">
                             Nhập số điện thoại để tìm kiếm mã OTP tương ứng
                         </p>
                     </div>
 
-                    <form onSubmit={handleSearchSubmit} className="space-y-4">
-                        <div className="relative">
-                            <Input
-                                type="text"
-                                value={phoneSearch}
-                                onChange={handlePhoneChange}
-                                placeholder="Nhập số điện thoại (VD: 0987654321)"
-                                disabled={loading}
-                                leftIcon={
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                    </svg>
-                                }
-                                rightElement={
-                                    <div className="flex items-center space-x-2">
-                                        {phoneSearch && (
-                                            <Button
-                                                type="button"
-                                                onClick={clearSearch}
-                                                variant="ghost"
-                                                size="sm"
-                                                className="!p-1 !h-auto !min-h-0 !min-w-0 hover:bg-transparent"
-                                            >
-                                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                            </Button>
-                                        )}
-                                        <Button
-                                            type="submit"
-                                            variant="primary"
-                                            size="sm"
-                                            loading={loading}
-                                            leftIcon={
-                                                !loading && (
-                                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                                    </svg>
-                                                )
-                                            }
-                                        >
-                                            Tìm kiếm
-                                        </Button>
-                                    </div>
-                                }
-                            />
+                    <form onSubmit={handleSearchSubmit} className="otp-search-form space-y-4">
+                        {/* Mobile: Stack input and buttons vertically */}
+                        <div className="block sm:hidden">
+                            <div className="search-input-wrapper">
+                                <Input
+                                    type="text"
+                                    value={phoneSearch}
+                                    onChange={handlePhoneChange}
+                                    placeholder="Nhập số điện thoại (VD: 0987654321)"
+                                    disabled={loading}
+                                    size={'sm'}
+                                    leftIcon={
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                        </svg>
+                                    }
+                                />
+                            </div>
+                            <div className="search-buttons-mobile">
+                                <Button
+                                    type="submit"
+                                    variant="primary"
+                                    loading={loading}
+                                    leftIcon={
+                                        !loading && (
+                                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                            </svg>
+                                        )
+                                    }
+                                >
+                                    Tìm kiếm
+                                </Button>
+                                {phoneSearch && (
+                                    <Button
+                                        type="button"
+                                        onClick={clearSearch}
+                                        variant="secondary"
+                                        leftIcon={
+                                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        }
+                                    >
+                                        Xóa bộ lọc
+                                    </Button>
+                                )}
+                            </div>
                         </div>
 
+                        {/* Desktop and Tablet: Show input with inline buttons */}
+                        <div className="hidden sm:block">
+                            <div className="input-container-responsive">
+                                <Input
+                                    type="text"
+                                    value={phoneSearch}
+                                    onChange={handlePhoneChange}
+                                    placeholder="Nhập số điện thoại (VD: 0987654321)"
+                                    disabled={loading}
+                                    className="pr-24"
+                                    leftIcon={
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                        </svg>
+                                    }
+                                />
+                                <div className="input-right-elements">
+                                    {phoneSearch && (
+                                        <Button
+                                            type="button"
+                                            onClick={clearSearch}
+                                            variant="ghost"
+                                            className="btn-icon-only"
+                                        >
+                                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </Button>
+                                    )}
+                                    <Button
+                                        type="submit"
+                                        variant="primary"
+                                        className="btn-small"
+                                        loading={loading}
+                                        leftIcon={
+                                            !loading && (
+                                                <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                </svg>
+                                            )
+                                        }
+                                    >
+                                        Tìm
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Search Tag Display */}
                         {phoneSearch && (
-                            <div className="flex items-center justify-center">
-                                <div className="inline-flex items-center px-4 py-2 rounded-full text-sm bg-blue-50/50 text-blue-700 border border-blue-200/50 backdrop-blur-sm">
+                            <div className="search-tag-mobile sm:flex sm:items-center sm:justify-center">
+                                <div className="inline-flex items-center px-3 py-2 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm bg-blue-50/50 text-blue-700 border border-blue-200/50 backdrop-blur-sm">
                                     <span>Đang tìm kiếm: </span>
                                     <span className="font-medium ml-1">"{phoneSearch}"</span>
                                     <Button
                                         type="button"
                                         onClick={clearSearch}
                                         variant="ghost"
-                                        size="sm"
-                                        className="ml-2 !p-1 !h-auto !min-h-0 !min-w-0 text-blue-600 hover:text-blue-800"
+                                        className="ml-2 btn-icon-only !p-1 !h-4 !w-4 !min-h-0 !min-w-0 text-blue-600 hover:text-blue-800"
                                     >
-                                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                         </svg>
                                     </Button>
@@ -374,30 +424,30 @@ const OtpPage: React.FC = () => {
                 {/* OTP Table Card */}
                 <Card className="liquid-glass-card">
                     {loading ? (
-                        <div className="flex justify-center items-center py-20">
+                        <div className="flex justify-center items-center py-12 sm:py-20">
                             <div className="loading-spinner"></div>
-                            <span className="ml-4 text-var(--primary-text-secondary)">
+                            <span className="ml-4 text-sm sm:text-base text-var(--primary-text-secondary)">
                                 Đang tải dữ liệu OTP...
                             </span>
                         </div>
                     ) : (
-                        <div className="macos26-table-wrapper">
+                        <div className="macos26-table-wrapper otp-table-mobile sm:text-base">
                             <Table className="macos26-table">
                                 <TableHeader className="macos26-table-head">
                                     <TableRow>
-                                        <TableHead className="macos26-table-header-cell w-16">
+                                        <TableHead className="macos26-table-header-cell w-12 sm:w-16">
                                             STT
                                         </TableHead>
-                                        <TableHead className="macos26-table-header-cell min-w-[150px]">
+                                        <TableHead className="macos26-table-header-cell min-w-[120px] sm:min-w-[150px]">
                                             Số điện thoại
                                         </TableHead>
-                                        <TableHead className="macos26-table-header-cell min-w-[120px]">
+                                        <TableHead className="macos26-table-header-cell min-w-[100px] sm:min-w-[120px]">
                                             Mã OTP
                                         </TableHead>
-                                        <TableHead className="macos26-table-header-cell min-w-[130px]">
-                                            Hết hạn vào lúc
+                                        <TableHead className="macos26-table-header-cell min-w-[100px] sm:min-w-[130px]">
+                                            Hết hạn lúc
                                         </TableHead>
-                                        <TableHead className="macos26-table-header-cell w-32">
+                                        <TableHead className="macos26-table-header-cell w-24 sm:w-32">
                                             Trạng thái
                                         </TableHead>
                                     </TableRow>
@@ -423,7 +473,7 @@ const OtpPage: React.FC = () => {
                                                 </TableCell>
                                                 <TableCell className="macos26-table-cell">
                                                     <span className="text-var(--primary-text-secondary) otp-table-expire">
-                                                        {formatExpireTime(item.expire) || 'Không xác định'}
+                                                        {formatExpireTime(item.expire) || 'N/A'}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="macos26-table-cell">
@@ -435,15 +485,15 @@ const OtpPage: React.FC = () => {
                                         ))
                                     ) : (
                                         <TableRow>
-                                            <TableCell colSpan={5} className="macos26-table-cell text-center py-16">
+                                            <TableCell colSpan={5} className="macos26-table-cell text-center py-12 sm:py-16">
                                                 <div className="flex flex-col items-center justify-center space-y-4">
-                                                    <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-                                                        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                                                        <svg className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0118 12a8 8 0 01-8 8 8 8 0 01-8-8 7.962 7.962 0 012-5.291m0 0A7.962 7.962 0 0112 4c2.038 0 3.9.762 5.291 2M6.709 6.009c.362-.362.75-.709 1.164-1.041" />
                                                         </svg>
                                                     </div>
                                                     <div className="text-center">
-                                                        <p className="text-var(--primary-text-secondary) text-lg">
+                                                        <p className="text-var(--primary-text-secondary) text-sm sm:text-lg">
                                                             {phoneSearch
                                                                 ? `Không tìm thấy OTP cho số điện thoại "${phoneSearch}"`
                                                                 : 'Chưa có dữ liệu OTP nào'
@@ -473,14 +523,12 @@ const OtpPage: React.FC = () => {
                 {/* Footer Statistics Card */}
                 {list.length > 0 && (
                     <Card className="liquid-glass-card">
-                        <div className="flex items-center justify-between text-sm">
-                            <div className="flex items-center space-x-4">
-                                <div className="text-var(--primary-text-secondary)">
-                                    Hiển thị <span className="font-medium text-var(--primary-text)">{list.length}</span> kết quả
-                                    {phoneSearch && (
-                                        <span> cho từ khóa "<span className="font-medium text-var(--primary-text)">{phoneSearch}</span>"</span>
-                                    )}
-                                </div>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-xs sm:text-sm space-y-2 sm:space-y-0">
+                            <div className="text-var(--primary-text-secondary)">
+                                Hiển thị <span className="font-medium text-var(--primary-text)">{list.length}</span> kết quả
+                                {phoneSearch && (
+                                    <span> cho từ khóa "<span className="font-medium text-var(--primary-text)">{phoneSearch}</span>"</span>
+                                )}
                             </div>
                             <div className="text-var(--primary-text-secondary)">
                                 Giới hạn: {limit} bản ghi

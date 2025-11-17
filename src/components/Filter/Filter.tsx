@@ -19,8 +19,9 @@ export interface FilterField {
     options?: FilterOption[];
     value: string | string[];
     onChange: (value: any) => void;
-    colSpan?: 1 | 2 | 3 | 4;
+    colSpan?: 1 | 2 | 3 | 4 | 'full';
     disabled?: boolean;
+    priority?: 'high' | 'medium' | 'low'; // For mobile ordering
 }
 
 export interface ExportOption {
@@ -39,6 +40,8 @@ export interface FilterProps {
     showExport?: boolean;
     onExport?: (type: 'excel' | 'pdf') => void;
     exportOptions?: ExportOption[];
+    responsive?: boolean;
+    mobileCollapsible?: boolean;
 }
 
 const Filter: React.FC<FilterProps> = memo(({
@@ -50,28 +53,28 @@ const Filter: React.FC<FilterProps> = memo(({
     submitLabel = "Báo cáo",
     showExport = false,
     onExport,
-    exportOptions = []
+    exportOptions = [],
+    responsive = true,
+    mobileCollapsible = true
 }) => {
-    // Memoize default export options
-    // const defaultExportOptions: ExportOption[] = useMemo(() => [
-    //     {
-    //         type: 'excel',
-    //         label: 'Xuất Excel',
-    //         icon: (
-    //             <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-    //                 <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-    //                 <path fillRule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 001 1h6a1 1 0 001-1V3a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5z" clipRule="evenodd" />
-    //             </svg>
-    //         )
-    //     }
-    // ], []);
+    // Responsive field sorting for mobile
+    const sortedFields = useMemo(() => {
+        if (!responsive) return fields;
 
-    const finalExportOptions = useMemo(() => 
+        return [...fields].sort((a, b) => {
+            const priorityOrder = { high: 1, medium: 2, low: 3 };
+            const aPriority = priorityOrder[a.priority || 'medium'];
+            const bPriority = priorityOrder[b.priority || 'medium'];
+            return aPriority - bPriority;
+        });
+    }, [fields, responsive]);
+
+    const finalExportOptions = useMemo(() =>
         exportOptions.length > 0 ? exportOptions : [],
-        [exportOptions, []]
+        [exportOptions]
     );
 
-    // Memoize field rendering to avoid re-creation
+    // Enhanced responsive field rendering
     const renderField = useCallback((field: FilterField) => {
         const baseProps = {
             disabled: field.disabled,
@@ -80,6 +83,12 @@ const Filter: React.FC<FilterProps> = memo(({
             required: false
         };
 
+        // Add responsive props for mobile optimization
+        const responsiveProps = responsive ? {
+            className: 'filter-field-input-responsive',
+            size: 'md' as const
+        } : {};
+
         switch (field.type) {
             case 'date':
                 return (
@@ -87,6 +96,7 @@ const Filter: React.FC<FilterProps> = memo(({
                         value={field.value as string}
                         onChange={field.onChange}
                         {...baseProps}
+                        {...responsiveProps}
                     />
                 );
             case 'text':
@@ -95,10 +105,11 @@ const Filter: React.FC<FilterProps> = memo(({
                         value={field.value as string}
                         onChange={(e) => field.onChange(e.target.value)}
                         {...baseProps}
+                        {...responsiveProps}
                     />
                 );
             case 'select':
-                const selectOptions = useMemo(() => 
+                const selectOptions = useMemo(() =>
                     (field.options || []).map(option => ({
                         key: option.key || '',
                         value: option.value || option.text || option.label || option.key || '',
@@ -113,6 +124,7 @@ const Filter: React.FC<FilterProps> = memo(({
                         onChange={field.onChange}
                         options={selectOptions}
                         {...baseProps}
+                        {...responsiveProps}
                     />
                 );
             case 'multiselect':
@@ -133,70 +145,65 @@ const Filter: React.FC<FilterProps> = memo(({
                         disabled={field.disabled}
                         searchable={true}
                         label={field.label}
+                        {...responsiveProps}
                     />
                 );
             default:
                 return null;
         }
-    }, []);
+    }, [responsive]);
 
-    // Memoize field grouping
-    const fieldRows = useMemo(() => {
-        const rows: FilterField[][] = [];
-        let currentRow: FilterField[] = [];
-        let currentRowSpan = 0;
-
-        fields.forEach(field => {
-            const fieldSpan = field.colSpan || 1;
-
-            if (currentRowSpan + fieldSpan > 4) {
-                if (currentRow.length > 0) {
-                    rows.push(currentRow);
-                }
-                currentRow = [field];
-                currentRowSpan = fieldSpan;
-            } else {
-                currentRow.push(field);
-                currentRowSpan += fieldSpan;
-            }
-        });
-
-        if (currentRow.length > 0) {
-            rows.push(currentRow);
+    // Responsive field grouping
+    const getFieldSpanClass = useCallback((field: FilterField) => {
+        if (!responsive) {
+            return typeof field.colSpan === 'number' && field.colSpan > 1 ?
+                `filter-field-span-${field.colSpan}` :
+                'filter-field-span-1';
         }
 
-        return rows;
-    }, [fields]);
+        const span = field.colSpan || 1;
+        if (span === 'full') return 'filter-field-responsive span-full';
+        if (span > 2) return 'filter-field-responsive span-full'; // Force full width on mobile for large spans
+        return `filter-field-responsive ${span > 1 ? 'span-2' : ''}`;
+    }, [responsive]);
 
     // Memoize handlers
     const handleExport = useCallback((type: 'excel' | 'pdf') => {
         onExport?.(type);
     }, [onExport]);
 
+    const containerClass = responsive ? 'filter-responsive-container' : 'filter-container';
+    const cardClass = responsive ? 'filter-card-responsive' : 'filter-card';
+    const contentClass = responsive ? 'filter-content-responsive' : 'filter-content';
+    const headerClass = responsive ? 'filter-header-responsive' : 'filter-header';
+    const gridClass = responsive ? 'filter-responsive-grid' : 'filter-row';
+    const actionsClass = responsive ? 'filter-actions-responsive' : 'filter-actions';
+    const buttonsClass = responsive ? 'filter-buttons-responsive' : 'filter-buttons';
+
     return (
-        <div className="filter-container">
-            <Card variant="default" className="filter-card">
-                <CardContent className="filter-content">
-                    {/* Header */}
-                    <div className="filter-header">
+        <div className={containerClass}>
+            <Card variant="default" className={cardClass}>
+                <CardContent className={contentClass}>
+                    {/* Responsive Header */}
+                    <div className={headerClass}>
                         <div className="filter-header-content">
-                            <div className="filter-icon">
-                                <svg className="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className={responsive ? "filter-icon-responsive filter-icon" : "filter-icon"}>
+                                <svg className="h-full w-full text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
                                 </svg>
                             </div>
-                            <h3 className="filter-title">
+                            <h3 className={responsive ? "filter-title-responsive" : "filter-title"}>
                                 {title}
                             </h3>
                         </div>
-                        
+
                         <Button
                             type="button"
                             variant="ghost"
-                            size="sm"
+                            size={responsive ? "md" : "sm"}
                             onClick={onReset}
                             disabled={loading}
-                            className="filter-reset-btn"
+                            className={responsive ? "filter-button-responsive filter-reset-btn" : "filter-reset-btn"}
                             leftIcon={
                                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -207,29 +214,22 @@ const Filter: React.FC<FilterProps> = memo(({
                         </Button>
                     </div>
 
-                    {/* Form Content */}
+                    {/* Responsive Form Content */}
                     <form onSubmit={onSubmit} className="filter-form">
-                        <div className="filter-fields">
-                            {fieldRows.map((row, rowIndex) => (
-                                <div key={rowIndex} className="filter-row">
-                                    {row.map((field) => (
-                                        <div
-                                            key={field.name}
-                                            className={`filter-field ${field.colSpan && field.colSpan > 1 ? 
-                                                `filter-field-span-${field.colSpan}` : 
-                                                'filter-field-span-1'
-                                            }`}
-                                        >
-                                            {renderField(field)}
-                                        </div>
-                                    ))}
+                        <div className={gridClass}>
+                            {sortedFields.map((field) => (
+                                <div
+                                    key={field.name}
+                                    className={getFieldSpanClass(field)}
+                                >
+                                    {renderField(field)}
                                 </div>
                             ))}
                         </div>
 
-                        {/* Action Buttons */}
-                        <div className="filter-actions">
-                            <div className="filter-buttons">
+                        {/* Responsive Action Buttons */}
+                        <div className={actionsClass}>
+                            <div className={buttonsClass}>
                                 {showExport && onExport && finalExportOptions.map((exportOption) => (
                                     <Button
                                         key={exportOption.type}
@@ -239,19 +239,24 @@ const Filter: React.FC<FilterProps> = memo(({
                                         onClick={() => handleExport(exportOption.type)}
                                         disabled={loading}
                                         leftIcon={exportOption.icon}
-                                        className="filter-export-btn"
+                                        className={responsive ? "filter-button-responsive filter-export-btn" : "filter-export-btn"}
                                     >
-                                        {exportOption.label}
+                                        <span className={responsive ? "hidden sm:inline" : ""}>
+                                            {exportOption.label}
+                                        </span>
+                                        <span className={responsive ? "sm:hidden" : "hidden"}>
+                                            {exportOption.type === 'excel' ? 'Excel' : 'PDF'}
+                                        </span>
                                     </Button>
                                 ))}
-                                
+
                                 <Button
                                     type="submit"
                                     variant="primary"
                                     size="md"
                                     disabled={loading}
                                     loading={loading}
-                                    className="filter-submit-btn"
+                                    className={responsive ? "filter-button-responsive filter-submit-btn" : "filter-submit-btn"}
                                     leftIcon={
                                         !loading ? (
                                             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -260,174 +265,18 @@ const Filter: React.FC<FilterProps> = memo(({
                                         ) : undefined
                                     }
                                 >
-                                    {loading ? 'Đang xử lý...' : submitLabel}
+                                    <span className={responsive ? "hidden sm:inline" : ""}>
+                                        {loading ? 'Đang xử lý...' : submitLabel}
+                                    </span>
+                                    <span className={responsive ? "sm:hidden" : "hidden"}>
+                                        {loading ? 'Xử lý...' : 'Báo cáo'}
+                                    </span>
                                 </Button>
                             </div>
                         </div>
                     </form>
                 </CardContent>
             </Card>
-
-            <style jsx>{`
-                .filter-container {
-                    margin-bottom: 2rem;
-                    will-change: transform;
-                    backface-visibility: hidden;
-                    transform: translateZ(0);
-                }
-
-                .filter-card {
-                    border: 2px solid var(--card-border);
-                    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-                    backdrop-filter: blur(16px);
-                    background: rgba(255, 255, 255, 0.95);
-                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                }
-
-                .filter-content {
-                    padding: 1.5rem;
-                }
-
-                .filter-header {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    margin-bottom: 2rem;
-                    padding-bottom: 1rem;
-                    border-bottom: 2px solid var(--accent);
-                    border-bottom-opacity: 0.2;
-                }
-
-                .filter-header-content {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.75rem;
-                }
-
-                .filter-icon {
-                    width: 2rem;
-                    height: 2rem;
-                    border-radius: 0.5rem;
-                    background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-
-                .filter-title {
-                    font-size: 1.25rem;
-                    font-weight: 700;
-                    color: var(--primary-text);
-                    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-                }
-
-                .filter-reset-btn {
-                    transition: all 0.2s ease;
-                }
-
-                .filter-reset-btn:hover {
-                    background-color: rgba(239, 68, 68, 0.1);
-                    color: var(--macos-red);
-                }
-
-                .filter-form {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 1.5rem;
-                }
-
-                .filter-fields {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 1.5rem;
-                }
-
-                .filter-row {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                    gap: 1.5rem;
-                }
-
-                @media (min-width: 768px) {
-                    .filter-row {
-                        grid-template-columns: repeat(2, 1fr);
-                    }
-                }
-
-                @media (min-width: 1024px) {
-                    .filter-row {
-                        grid-template-columns: repeat(3, 1fr);
-                    }
-                }
-
-                @media (min-width: 1280px) {
-                    .filter-row {
-                        grid-template-columns: repeat(4, 1fr);
-                    }
-                }
-
-                .filter-field {
-                    min-width: 0;
-                }
-
-                .filter-field-span-2 {
-                    grid-column: span 2;
-                }
-
-                .filter-field-span-3 {
-                    grid-column: span 3;
-                }
-
-                .filter-field-span-4 {
-                    grid-column: span 4;
-                }
-
-                .filter-actions {
-                    display: flex;
-                    align-items: center;
-                    justify-content: flex-end;
-                    padding-top: 2rem;
-                    margin-top: 2rem;
-                    border-top: 2px solid var(--card-border);
-                    border-top-opacity: 0.3;
-                }
-
-                .filter-buttons {
-                    display: flex;
-                    gap: 0.75rem;
-                    flex-wrap: wrap;
-                }
-
-                .filter-export-btn {
-                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-                }
-
-                .filter-export-btn:hover {
-                    transform: translateY(-1px);
-                    box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.15);
-                }
-
-                .filter-submit-btn {
-                    min-width: 140px;
-                    background: linear-gradient(to right, var(--accent), var(--accent-secondary));
-                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-                }
-
-                .filter-submit-btn:hover {
-                    transform: translateY(-1px);
-                    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
-                }
-
-                @media (prefers-reduced-motion: reduce) {
-                    * {
-                        animation-duration: 0.01ms !important;
-                        animation-iteration-count: 1 !important;
-                        transition-duration: 0.01ms !important;
-                    }
-                }
-            `}</style>
         </div>
     );
 });
